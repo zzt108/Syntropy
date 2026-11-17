@@ -250,7 +250,7 @@ Cheap trick worth trying early (still no code): **play a paper prototype in chat
 
 ## 9. Decision log (append-only, newest on top)
 
-- **2026-11-17**: The Flux design repo is merged into the Unciv fork (`zzt_develop`) with its history; one repo for docs and code from now on. Flux's Apache-2.0 `LICENSE` and `Flux.code-workspace` were left out. The repo name *Flux* in the title line is historical.
+- **2026-11-17**: The Flux design repo is merged into the Unciv fork (`zzt_develop`) with its history; one repo for docs and code from now on. Flux's Apache-2.0 `LICENSE` and `Flux.code-workspace` were left out. `CLAUDE.md` and `.claude/` are not tracked in this repo either: the user keeps them in the AIPrompts repo. The repo name *Flux* in the title line is historical.
 
 - **2026-11-17**: Unciv assessed as engine. Decided: Unciv fork in Kotlin (D-41, D-04's Unity C# dropped); Civ V content trimmed by ruleset only during development (D-42); fork stays unofficial, own code hooks in with minimal upstream changes (D-43). Hidden soul state can be stored as hidden stockpiled resources, see the note under §4 "Engine notes".
 
