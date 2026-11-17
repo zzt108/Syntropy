@@ -50,6 +50,9 @@ Philosophy underneath: *everything is one mind's appearance, so everything is go
 | D-22 | **Choice of Fate, v2:** the player receives the hexagram as **line keywords + a situation summary**, and picks several of them in a **"most / least" (DISC-like forced choice)** way. **How many** they may pick depends on **flexibility stats**. | 2026-11-17. Working reading: "most" = that line changes, "least" = that line is held this turn. Supersedes the "pick one keyword" loop in §4. |
 | D-23 | **Hidden profile from choices.** The pattern of the player's picks builds a profile the player never sees as numbers. The profile feeds back: it influences **how many changing lines** can be chosen (and possibly the line odds of D-21). | 2026-11-17. Strong RPG link (Q-22). Dimensions and feedback balance: Q-27. |
 | D-24 | **The core formula.** (1) The **I Ching** is the game's **state engine**: non-negotiable. (2) The **disturbing emotions / wisdoms** form the **player profile**. (3) The game *is* the **interplay of these two + random effects + player interaction**. | 2026-11-17. Answers the axes part of Q-27: profile = 5 disturbing emotions ↔ 5 wisdoms. Everything else (resources, Valuation Engine, Auto-Governor, LLM realms) serves this core. See §4 "Core engine". |
+| D-25 | **One rule system: world events push lines.** Random effects include world events (drought, plague, a stranger arriving), but every event is expressed as a push on hexagram lines / line odds. No second rulebook beside the I Ching engine. | 2026-11-17. Resolves Q-28. |
+| D-26 | **Same engine, same profile, two kinds of minds.** Every realm has a profile. Other players are embodied by **LLMs with different profiles**. The human player(s) may ask an **LLM advisor** for help with their own choices. | 2026-11-17. Resolves Q-29, mostly answers Q-02. "Player(s)" leaves room for more than one human. Follow-ups: Q-30. |
+| D-27 | **The advisor has its own profile.** A proud advisor gives proud advice; choosing an advisor = choosing a mirror. | 2026-11-17. Resolves Q-30 (b). Working view on Q-30 (a) kept: following advice is the human's choice, so the human's profile moves. |
 
 ## 4. Core model (as understood so far)
 
@@ -137,8 +140,9 @@ Grouped by the session that should resolve them (§7). **Bold** = blocks other d
 - **Q-05 Turn granularity:** does the hexagram change every turn, every era, or only on a keyword choice?
 - **Q-26 How does the weighting work (D-21)?** Candidate pipeline: *situation* (disturbing emotions, cooperation, monopoly) → per-line odds of becoming a changing line → random draw marks the "trembling" lines → player picks among them through keywords. Note: the traditional casting methods are already non-uniform (yarrow stalks vs. coins give different odds for old yin/old yang), so the odds are a natural tuning knob. Idea: in Standstill lines get "stuck" (low odds) while pressure builds; collapse = many lines changing at once. Open: what does "like the DISC test" mean for the player's choice (forced choice of most/least-fitting words?), and does the choice profile feed back into the weights?
 - **Q-27 Profile feedback (D-22, D-23):** axes settled by D-24 (5 disturbing emotions ↔ 5 wisdoms). Is "flexibility" its own stat or derived from the profile (e.g. rigidity = ego)? Guard against a **rich-get-richer spiral** (flexible → more picks → more flexible; rigid → stuck): what counterforce (crisis, P2 flip)? Is the profile fractal (character / group / realm)?
-- **Q-28 What are the "random effects" (D-24)?** Only the weighted line draw, or also world events (drought, flood, plague, a stranger arriving)? Are events themselves expressed as line pushes, so that everything still flows through the I Ching engine?
-- Q-29 Do **LLM realms** have a profile too? Symmetry (Q-02) suggests yes: same engine, same profile, two kinds of minds.
+- ~~Q-28 What are the "random effects"?~~ Resolved by D-25.
+- ~~Q-29 Do LLM realms have a profile too?~~ Resolved by D-26.
+- **Q-30 Advisor & LLM profiles (D-26):** (a) If the human follows the advisor's suggestion, whose profile moves? Working view: following advice is itself a choice, so the human's. ~~(b) Does the advisor have a profile of its own?~~ Yes, D-27. Still open: can the player pick/switch advisors, and does the advisor's profile drift too? (c) An LLM realm's profile is seeded by its persona, but does it **drift** with its own choices, and is the persona text in `STATE.md` regenerated from the current profile? (d) Bridge load: N rival realms + an advisor = how many copy-pastes per turn before ritual becomes chore (Q-04)?
 - Q-06 How do realms' hexagrams **interact**? (Trade/war/contact pushing lines in the neighbour's hexagram.)
 - Q-07 "Fractal": is there also a hexagram per **city / group / person**, not only per realm?
 - Q-08 Keyword source: own phrasing derived from public-domain translations (e.g. Legge, 1882)? Some later translations are still under copyright.
@@ -205,6 +209,8 @@ Cheap trick worth trying early (still no code): **play a paper prototype in chat
 
 ## 9. Decision log (append-only, newest on top)
 
+- **2026-11-17**: Advisor has its own profile (D-27).
+- **2026-11-17**: World events push lines, one rule system (D-25, Q-28 closed). Every realm has a profile; rivals = LLMs with different profiles, humans may use an LLM advisor (D-26, Q-29 closed). Follow-ups in Q-30.
 - **2026-11-17**: Core formula agreed (D-24): I Ching state engine × disturbing-emotions/wisdoms profile + random effects + player interaction. Core engine diagram added to §4. New questions Q-28, Q-29.
 - **2026-11-17**: Choice of Fate v2: line keywords + situation summary, DISC-like most/least picks, count by flexibility (D-22). Hidden profile from choices feeds back into the pick count (D-23). Open: Q-27.
 - **2026-11-17**: Same-seed rule limited to testing/replay; real game may be random (D-20). Hexagram changes weighted by situation, changing lines random and/or chosen (D-21). Mechanism in Q-26. HallucInc sub-agent workflow rejected.
