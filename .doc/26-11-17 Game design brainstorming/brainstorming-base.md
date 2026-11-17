@@ -30,8 +30,8 @@ Philosophy underneath: *everything is one mind's appearance, so everything is go
 | D-02 | No winning. Emergence and a **Journal** (auto-chronicle) take its place. | Revised 2026-11-17: there **is** one fail condition, see D-19. |
 | D-03 | Evolution is social/mental, not biological. **Religion is emergent, not a menu item**: no built-in religion mechanic, but belief systems may emerge from concepts. | Revised 2026-11-17. Rationale: in Civ every religion is the same buff package with a different name. What really moves people is the **ego illusion**; religion is one of its group-scale forms. See D-16, Q-21. |
 | D-04 | Engine: **Unity C#**, Windows first, Android tablet maybe later. | Repo `CLAUDE.md` still describes a .NET WinForms *JobTracker*; it needs replacing before Phase 3 (implementation). |
-| D-05 | **LLM players** via Markdown: game emits `STATE.md`, LLM returns `RESPONSE.md`. | |
-| D-06 | **Manual Bridge** first: the human copy-pastes/drag-drops between game and chat. No API. | Bridge = ritual. |
+| D-05 | **LLM players** via Markdown: game emits `STATE.md`, LLM returns `RESPONSE.md`. | ⚠ Superseded for rivals by D-28 (coded rivals) and for the human side by D-29 (one-way advisor). |
+| D-06 | **Manual Bridge** first: the human copy-pastes/drag-drops between game and chat. No API. | Bridge = ritual. Revised by D-29: the bridge is now **one-way** (game → player's own LLM project) and optional. Still no API. |
 | D-07 | LLM rules live in a doc set: `SYSTEM_CORE.md`, `PROTOCOL_RESPONSE.md`, `WORLD_LOGIC.md`, `EVOLUTION_LIBRARY.md`. | |
 | D-08 | **I Ching hexagram = realm state.** Every realm has one. Player picks the changing line via keywords ("Choice of Fate"). | Player never needs to know it's I Ching. |
 | D-09 | **Trigrams = passive buffs** (upper + lower trigram → two traits). | |
@@ -53,6 +53,9 @@ Philosophy underneath: *everything is one mind's appearance, so everything is go
 | D-25 | **One rule system: world events push lines.** Random effects include world events (drought, plague, a stranger arriving), but every event is expressed as a push on hexagram lines / line odds. No second rulebook beside the I Ching engine. | 2026-11-17. Resolves Q-28. |
 | D-26 | **Same engine, same profile, two kinds of minds.** Every realm has a profile. Other players are embodied by **LLMs with different profiles**. The human player(s) may ask an **LLM advisor** for help with their own choices. | 2026-11-17. Resolves Q-29, mostly answers Q-02. "Player(s)" leaves room for more than one human. Follow-ups: Q-30. |
 | D-27 | **The advisor has its own profile.** A proud advisor gives proud advice; choosing an advisor = choosing a mirror. | 2026-11-17. Resolves Q-30 (b). Working view on Q-30 (a) kept: following advice is the human's choice, so the human's profile moves. |
+| D-28 | **Rivals are code, written by an LLM from the rulebook.** Non-human-serving realms are not played live by a chat LLM; an LLM writes their decision code at development time from the rulebook. A rival mind = a deterministic function of (visible state, profile) → most/least picks. | 2026-11-17. No copy-paste for rivals. Profile drift (Q-30 c) comes for free: the profile is an input. Makes replay exact (D-20, Q-17). Cost: live concept invention by rivals is lost, see Q-31. |
+| D-29 | **Human companion = the player's own LLM project.** We ship an **advisor kit**: recommended instructions, the rulebook, optionally skills, and advisor persona files (each with its own profile, D-27). The player creates a project in their LLM of choice and pastes in the **current state as the player sees it** (player view, no hidden info). | 2026-11-17. One-way: the game never parses the advice; the human reads it and chooses. Optional: the game is fully playable without it. Reuses the doc set of D-07 as the kit. |
+| D-30 | **Concepts come from a pre-generated library first.** At development time an LLM generates a tagged concept library; the Valuation Engine prices it (D-12); realms pick from it by tags. Advisor import of new concepts (Q-31 b) is **deferred**, a possible later extension. | 2026-11-17. Resolves Q-31 as (a) now, (c) maybe later. Library size and tag vocabulary: Q-10. Decay/forgetting: Q-11. |
 
 ## 4. Core model (as understood so far)
 
@@ -73,7 +76,7 @@ RND --> IC : weighted draw of\n"trembling" lines
 @enduml
 ```
 
-### Who decides what (earlier LLM-centric view)
+### Who decides what (earlier LLM-centric view, ⚠ outdated by D-28, D-29)
 
 ```plantuml
 @startuml
@@ -142,7 +145,8 @@ Grouped by the session that should resolve them (§7). **Bold** = blocks other d
 - **Q-27 Profile feedback (D-22, D-23):** axes settled by D-24 (5 disturbing emotions ↔ 5 wisdoms). Is "flexibility" its own stat or derived from the profile (e.g. rigidity = ego)? Guard against a **rich-get-richer spiral** (flexible → more picks → more flexible; rigid → stuck): what counterforce (crisis, P2 flip)? Is the profile fractal (character / group / realm)?
 - ~~Q-28 What are the "random effects"?~~ Resolved by D-25.
 - ~~Q-29 Do LLM realms have a profile too?~~ Resolved by D-26.
-- **Q-30 Advisor & LLM profiles (D-26):** (a) If the human follows the advisor's suggestion, whose profile moves? Working view: following advice is itself a choice, so the human's. ~~(b) Does the advisor have a profile of its own?~~ Yes, D-27. Still open: can the player pick/switch advisors, and does the advisor's profile drift too? (c) An LLM realm's profile is seeded by its persona, but does it **drift** with its own choices, and is the persona text in `STATE.md` regenerated from the current profile? (d) Bridge load: N rival realms + an advisor = how many copy-pastes per turn before ritual becomes chore (Q-04)?
+- **Q-30 Advisor & LLM profiles (D-26):** (a) If the human follows the advisor's suggestion, whose profile moves? Working view: following advice is itself a choice, so the human's. ~~(b) Does the advisor have a profile of its own?~~ Yes, D-27. Still open: can the player pick/switch advisors, and does the advisor's profile drift too? ~~(c) persona drift~~ and ~~(d) bridge load~~: largely solved by D-28 (rivals are code, profile is an input) and D-29 (one optional, one-way paste per turn). Remaining: since the game never sees the advice (D-29), the advisor's profile cannot drift in-game; acceptable?
+- ~~Q-31 Who invents new concepts now?~~ Resolved by D-30: (a) library now, (c) maybe later. Original text kept for context: D-12's Valuation Engine assumed rivals invent concepts live. With coded rivals (D-28), options: (a) a concept library pre-generated by an LLM at development time, rivals pick from it by tags; (b) the human imports a concept proposed by their advisor (a small, validated `NEW_CONCEPT` paste back into the game); (c) both. Without some channel the "infinite evolution" idea shrinks to a finite library.
 - Q-06 How do realms' hexagrams **interact**? (Trade/war/contact pushing lines in the neighbour's hexagram.)
 - Q-07 "Fractal": is there also a hexagram per **city / group / person**, not only per realm?
 - Q-08 Keyword source: own phrasing derived from public-domain translations (e.g. Legge, 1882)? Some later translations are still under copyright.
@@ -184,6 +188,7 @@ Grouped by the session that should resolve them (§7). **Bold** = blocks other d
 - Hexagram as diplomacy mood: AI realm in "Conflict" ignores gold.
 - Art: minimalist, earth/pastel palette, "breathing" UI. Audio: generative ambient, silence allowed.
 - Logo: a hexagram resolving from chaos to order, left to right.
+- Advisor concept import (D-30, deferred): the player pastes a validated `NEW_CONCEPT` block proposed by their advisor back into the game; the Valuation Engine prices it. The only return channel from the LLM side.
 - Old phase plans (Gantt) from the source session: Protocol Design → Unity Foundation → Evolution & Emergence → Refinement & Flow. They are implementation plans, so they're out of scope for now.
 
 ## 7. Session roadmap (proposal)
@@ -209,6 +214,8 @@ Cheap trick worth trying early (still no code): **play a paper prototype in chat
 
 ## 9. Decision log (append-only, newest on top)
 
+- **2026-11-17**: Concepts from a pre-generated, tagged library; advisor import deferred (D-30, Q-31 closed).
+- **2026-11-17**: Rivals become LLM-written code from the rulebook (D-28). Human advisor = the player's own LLM project with a shipped advisor kit, one-way state paste (D-29). D-05/D-06 revised, LLM-centric diagram marked outdated. New question Q-31 (concept invention).
 - **2026-11-17**: Advisor has its own profile (D-27).
 - **2026-11-17**: World events push lines, one rule system (D-25, Q-28 closed). Every realm has a profile; rivals = LLMs with different profiles, humans may use an LLM advisor (D-26, Q-29 closed). Follow-ups in Q-30.
 - **2026-11-17**: Core formula agreed (D-24): I Ching state engine × disturbing-emotions/wisdoms profile + random effects + player interaction. Core engine diagram added to §4. New questions Q-28, Q-29.
