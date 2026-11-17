@@ -323,22 +323,23 @@ class AiStatusExporterTest {
         // Place Iron on a tile and improve it
         val ironTile = testGame.getTile(1, 0)
         ironTile.baseTerrain = "Grassland"
-        ironTile.resource = "Iron"
+        ironTile.tileResource = testGame.ruleset.tileResources["Iron"]
         ironTile.resourceAmount = 2
         ironTile.improvement = "Mine"
-        ironTile.setOwner(city)
+        city.expansion.takeOwnership(ironTile)
         ironTile.setTerrainTransients()
 
         // Place Horses on a tile but don't improve it (so we have a known resource with 0 amount)
         val horseTile = testGame.getTile(0, 1)
         horseTile.baseTerrain = "Plains"
-        horseTile.resource = "Horses"
+        horseTile.tileResource = testGame.ruleset.tileResources["Horses"]
         horseTile.resourceAmount = 4
-        horseTile.setOwner(city)
+        city.expansion.takeOwnership(horseTile)
         horseTile.setTerrainTransients()
         
         // Give the tech needed so they are "visible"
-        civ.tech.techsResearched.add("Iron Working") 
+        civ.tech.techsResearched.add("Iron Working")
+        civ.tech.techsResearched.add("Mining") // Mine improvement requires it to provide the resource
         civ.tech.techsResearched.add("Animal Husbandry")
 
         // Force a cache update to calculate detailedCivResources from the tiles

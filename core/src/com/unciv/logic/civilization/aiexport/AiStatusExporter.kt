@@ -158,7 +158,12 @@ object AiStatusExporter {
         val resourceList = civ.gameInfo.ruleset.tileResources.values
             .filter { it.resourceType == ResourceType.Strategic || it.resourceType == ResourceType.Luxury }
             .sortedWith(compareBy({ it.resourceType }, { it.name }))
-            
+
+        // Resource names the civ has actually seen on its explored tiles; computed once, not per resource
+        val resourcesOnExploredTiles = civ.gameInfo.tileMap.values
+            .filter { it.resource != null && civ.hasExplored(it) }
+            .mapTo(HashSet()) { it.resource!! }
+
         var hasResources = false
         for (resource in resourceList) {
             val totalAvailable = if (resource.isStockpiled) {
@@ -173,8 +178,9 @@ object AiStatusExporter {
                 tradablePerTurn.firstOrNull { it.resource == resource }?.amount ?: 0
             }
             
-            // Show if we have any available, or if it's tradable, or if it's a known strategic/luxury resource
-            val isKnownResource = civ.canSeeResource(resource)
+            // Show if we have any available, or if it's tradable, or if it's a revealed resource
+            // the civ has found on an explored tile (avoids listing every luxury with 0)
+            val isKnownResource = civ.canSeeResource(resource) && resource.name in resourcesOnExploredTiles
             if (totalAvailable > 0 || tradeable > 0 || isKnownResource) {
                 hasResources = true
                 sb.append("- **${resource.name}** (${resource.resourceType}): $totalAvailable available | $tradeable tradeable\n")
