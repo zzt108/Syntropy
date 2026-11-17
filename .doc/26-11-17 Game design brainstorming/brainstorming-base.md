@@ -1,7 +1,7 @@
 # SYNTROPY (repo: Flux) — Brainstorming Base
 
 > Living document for the game-design brainstorming. **No implementation code** until the user says so.
-> Source of everything marked *canon*: [`../Brain storming.md`](../Brain%20storming.md) (Perplexity session, undated, pre-2026-11).
+> Source of everything marked *canon*: the original Perplexity brainstorming session (undated, pre-2026-11). The raw transcript was deleted on 2026-11-17; **this document is now the canon**.
 > Each session: read this file → work one agenda item → update §3 Decisions, §5 Questions, §8 Log.
 
 ---
@@ -35,7 +35,7 @@ Philosophy underneath: *everything is one mind's appearance, so everything is go
 | D-07 | LLM rules live in a doc set: `SYSTEM_CORE.md`, `PROTOCOL_RESPONSE.md`, `WORLD_LOGIC.md`, `EVOLUTION_LIBRARY.md`. | |
 | D-08 | **I Ching hexagram = realm state.** Every realm has one. Player picks the changing line via keywords ("Choice of Fate"). | Player never needs to know it's I Ching. |
 | D-09 | **Trigrams = passive buffs** (upper + lower trigram → two traits). | |
-| D-10 | Determinism is **fractal**: same rules at every scale; same choice → same hexagram. | |
+| D-10 | Determinism is **fractal**: same rules at every scale; same choice → same hexagram. | Refined by D-20, D-21: the *rules* are deterministic, the *dice* are not (outside tests). |
 | D-11 | Four resources: **Material, Wealth, Knowledge, Culture.** | |
 | D-12 | **Valuation Engine** (C#, deterministic) prices LLM-invented concepts from their **tags**; LLM never sets costs. | Balance stays in code. |
 | D-13 | **Auto-Governor** executes the micro-management (builds, improvements) based on the chosen keyword/direction. | "Gardener" play style. |
@@ -45,10 +45,32 @@ Philosophy underneath: *everything is one mind's appearance, so everything is go
 | D-17 | The ego illusion shows up as **disturbing emotions**, at the individual level *and* at the group level (**group disturbing emotions**, the user's term). They are the **main antagonist force against cooperation (P4)**. | 2026-11-17. **Never named in the game**: the player only sees the emergent phenomena (feuds, hoarding, dogma, refusing a neighbour's know-how). Candidate set and transformation: Q-23. |
 | D-18 | **Institutions are wisdom deflected by ego, not institutionalized poison.** Every force (army, trade, law, belief) has a wise core; the individual/group ego gives it a ricochet. Example: an army's core is peace-keeping (deterrence, balance of power, cf. the Cold War); deflected, it becomes conquest. | 2026-11-17. Explicitly **against** David Loy's reading (§8). The poison is a **raw material the player uses**, not an enemy to eliminate. |
 | D-19 | **Fail condition: monopolization.** The weak get swept away and the remaining superpower turns dictatorial/monopolistic. The player's job is to decide how to use the poison: let monopolization happen, or keep it in check. | 2026-11-17. Fits Carse: the infinite game only "ends" when someone wins it. **Not a game over** (Q-24 → B, 2026-11-17): the hegemon falls into a heavy **Standstill** state (hexagram 12 as candidate) that can only be left through **collapse**, as empires do. The game continues after the fall. |
+| D-20 | **"Same seed + same choices (+ same stored LLM responses) = same run"** holds for **testing/replay only**. The real game may be random (fresh seed). | 2026-11-17. The engine must still *support* a fixed seed so tests and bug replays are exact. Links Q-17. |
+| D-21 | **Hexagram changes are weighted, not uniform.** The situation raises the odds of certain hexagrams (e.g. dictatorship/monopoly → Standstill). Changing lines may be random **and/or** chosen by the player. | 2026-11-17. Mechanism still open: Q-26. |
+| D-22 | **Choice of Fate, v2:** the player receives the hexagram as **line keywords + a situation summary**, and picks several of them in a **"most / least" (DISC-like forced choice)** way. **How many** they may pick depends on **flexibility stats**. | 2026-11-17. Working reading: "most" = that line changes, "least" = that line is held this turn. Supersedes the "pick one keyword" loop in §4. |
+| D-23 | **Hidden profile from choices.** The pattern of the player's picks builds a profile the player never sees as numbers. The profile feeds back: it influences **how many changing lines** can be chosen (and possibly the line odds of D-21). | 2026-11-17. Strong RPG link (Q-22). Dimensions and feedback balance: Q-27. |
+| D-24 | **The core formula.** (1) The **I Ching** is the game's **state engine**: non-negotiable. (2) The **disturbing emotions / wisdoms** form the **player profile**. (3) The game *is* the **interplay of these two + random effects + player interaction**. | 2026-11-17. Answers the axes part of Q-27: profile = 5 disturbing emotions ↔ 5 wisdoms. Everything else (resources, Valuation Engine, Auto-Governor, LLM realms) serves this core. See §4 "Core engine". |
 
 ## 4. Core model (as understood so far)
 
-Who decides what:
+### Core engine (D-24, 2026-11-17)
+
+```plantuml
+@startuml
+rectangle "I Ching\nstate engine\n(hexagram per realm)" as IC
+rectangle "Profile\n(5 disturbing emotions\n<-> 5 wisdoms)" as PR
+rectangle "Random effects" as RND
+actor "Player" as PL
+IC --> PL : line keywords +\nsituation summary
+PL --> IC : most / least picks\n(changing lines)
+PL --> PR : pattern of picks\nshapes the profile
+PR --> IC : line odds,\nnumber of picks
+IC --> PR : situation feeds\nemotions / wisdoms
+RND --> IC : weighted draw of\n"trembling" lines
+@enduml
+```
+
+### Who decides what (earlier LLM-centric view)
 
 ```plantuml
 @startuml
@@ -113,6 +135,10 @@ Grouped by the session that should resolve them (§7). **Bold** = blocks other d
 
 ### I Ching mechanic
 - **Q-05 Turn granularity:** does the hexagram change every turn, every era, or only on a keyword choice?
+- **Q-26 How does the weighting work (D-21)?** Candidate pipeline: *situation* (disturbing emotions, cooperation, monopoly) → per-line odds of becoming a changing line → random draw marks the "trembling" lines → player picks among them through keywords. Note: the traditional casting methods are already non-uniform (yarrow stalks vs. coins give different odds for old yin/old yang), so the odds are a natural tuning knob. Idea: in Standstill lines get "stuck" (low odds) while pressure builds; collapse = many lines changing at once. Open: what does "like the DISC test" mean for the player's choice (forced choice of most/least-fitting words?), and does the choice profile feed back into the weights?
+- **Q-27 Profile feedback (D-22, D-23):** axes settled by D-24 (5 disturbing emotions ↔ 5 wisdoms). Is "flexibility" its own stat or derived from the profile (e.g. rigidity = ego)? Guard against a **rich-get-richer spiral** (flexible → more picks → more flexible; rigid → stuck): what counterforce (crisis, P2 flip)? Is the profile fractal (character / group / realm)?
+- **Q-28 What are the "random effects" (D-24)?** Only the weighted line draw, or also world events (drought, flood, plague, a stranger arriving)? Are events themselves expressed as line pushes, so that everything still flows through the I Ching engine?
+- Q-29 Do **LLM realms** have a profile too? Symmetry (Q-02) suggests yes: same engine, same profile, two kinds of minds.
 - Q-06 How do realms' hexagrams **interact**? (Trade/war/contact pushing lines in the neighbour's hexagram.)
 - Q-07 "Fractal": is there also a hexagram per **city / group / person**, not only per realm?
 - Q-08 Keyword source: own phrasing derived from public-domain translations (e.g. Legge, 1882)? Some later translations are still under copyright.
@@ -154,7 +180,7 @@ Grouped by the session that should resolve them (§7). **Bold** = blocks other d
 - Hexagram as diplomacy mood: AI realm in "Conflict" ignores gold.
 - Art: minimalist, earth/pastel palette, "breathing" UI. Audio: generative ambient, silence allowed.
 - Logo: a hexagram resolving from chaos to order, left to right.
-- Old phase plans (Gantt) are kept in the source doc. They are implementation plans, so they're out of scope for now.
+- Old phase plans (Gantt) from the source session: Protocol Design → Unity Foundation → Evolution & Emergence → Refinement & Flow. They are implementation plans, so they're out of scope for now.
 
 ## 7. Session roadmap (proposal)
 
@@ -175,10 +201,14 @@ Cheap trick worth trying early (still no code): **play a paper prototype in chat
 - **Books/ideas:** David Loy, *The Great Awakening: A Buddhist Social Theory* (2003): the three poisons as *institutionalized* group-level forces. Kept as a **counterpoint**: the user rejects it (D-18: institutions are wisdom deflected by ego); Csikszentmihalyi, *Flow*; James P. Carse, *Finite and Infinite Games* (the source of "the infinite game"); Prigogine & Stengers, *Order Out of Chaos* (heads-up: the subtitle nearly repeats this book title); Fantappiè's syntropy; Eno & Schmidt's *Oblique Strategies* (a card deck of cryptic prompts, the nearest relative of "keywords as fate").
 - **Game patterns:** story generators that chronicle emergent history; minimalist choice-card games; non-violent, meditative builders; "social engineering" sliders in 4X games. Discuss which *patterns* we want, not which games.
 - **Name check:** "Syntropy" is also a term in agriculture (syntropic farming) and may be used by other products. Search before committing.
-- [`../HallucInc.md`](../HallucInc.md): notes on a CLAUDE.md and sub-agent setup for an AI-built game. Relevant later, when implementation starts.
+- *HallucInc notes* (deleted 2026-11-17): a Reddit post (r/ClaudeAI, "I built a free browser game with Claude Code") on a CLAUDE.md and sub-agent setup for an AI-built game. **Where it overlaps with `CLAUDE.md`, `CLAUDE.md` wins** (start-of-session reading = "re-read `.doc/` at every phase"; gated milestones = the 4-phase workflow with a stop after each phase; commit cadence = "commit only when the user asks", not "after each change"). Only one non-overlapping idea is kept for implementation: "same seed + same choices = same run" as a never-break rule (cf. D-10, Q-17). Its sub-agent workflow is **rejected**: no sub-agents in this project.
 
 ## 9. Decision log (append-only, newest on top)
 
+- **2026-11-17**: Core formula agreed (D-24): I Ching state engine × disturbing-emotions/wisdoms profile + random effects + player interaction. Core engine diagram added to §4. New questions Q-28, Q-29.
+- **2026-11-17**: Choice of Fate v2: line keywords + situation summary, DISC-like most/least picks, count by flexibility (D-22). Hidden profile from choices feeds back into the pick count (D-23). Open: Q-27.
+- **2026-11-17**: Same-seed rule limited to testing/replay; real game may be random (D-20). Hexagram changes weighted by situation, changing lines random and/or chosen (D-21). Mechanism in Q-26. HallucInc sub-agent workflow rejected.
+- **2026-11-17**: Source files `Brain storming.md` and `HallucInc.md` deleted by the user; links removed, this document is the canon. HallucInc ideas that overlap `CLAUDE.md` are superseded by `CLAUDE.md`.
 - **2026-11-17**: Q-24 resolved: monopolization leads to Standstill → collapse, not game over (D-19 updated). Follow-up mechanics in Q-25.
 - **2026-11-17**: Institutions = wisdom deflected by ego (D-18, against Loy). Fail condition introduced: monopolization (D-19, D-02 revised). New question Q-24.
 - **2026-11-17**: Disturbing emotions (individual + group) named as the main antagonist of cooperation, shown only through emergent phenomena (D-17). New question Q-23.
