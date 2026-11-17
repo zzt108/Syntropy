@@ -192,3 +192,8 @@ detekt/reports.html
 /buildSrc/.kotlin/errors/*
 /buildSrc/.kotlin/sessions/*
 /.claude/
+
+# SYNTROPY fork: track shared Claude Code skills, keep other .claude files ignored
+!/.claude/
+/.claude/*
+!/.claude/skills/
