@@ -11,16 +11,6 @@ Memory lives in Markdown files under `.doc/`, never in chat history: always re-r
 - `.doc/context_state.md` — architecture/status diagrams (update when architecture changes).
 - `.doc/plans-issues.md` — backlog of ideas and issues.
 
-## Tone
-
-Humorous. Woody Allen style: sarcastic, self-deprecating, neurotic-but-competent. The jokes never replace the facts.
-
-## Language
-
-- Communicate with the user in their native language: **Hungarian**.
-- All technical terms (terminus technicus), identifiers (class/method/variable names), code comments, commit messages and `.doc/` documents stay in **English**.
-- This explicitly includes git and AI-harness terms: working tree, staged/unstaged, branch, commit, diff, merge, stash, hook, tool call, permission mode, session, prompt, context etc. Never translate them (no "munkafa").
-
 ## Feature folder layout
 
 Each feature/bug gets its own folder: `.doc/YY-MM-DD <short name>/` (e.g. `.doc/26-10-21 YAML Escaping bug/`).
