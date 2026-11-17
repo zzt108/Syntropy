@@ -29,7 +29,7 @@ Philosophy underneath: *everything is one mind's appearance, so everything is go
 | D-01 | Turn-based, top-down map, human tribe → civilization. | Civ is the reference genre, not a template. |
 | D-02 | No winning. Emergence and a **Journal** (auto-chronicle) take its place. | Revised 2026-11-17: there **is** one fail condition, see D-19. |
 | D-03 | Evolution is social/mental, not biological. **Religion is emergent, not a menu item**: no built-in religion mechanic, but belief systems may emerge from concepts. | Revised 2026-11-17. Rationale: in Civ every religion is the same buff package with a different name. What really moves people is the **ego illusion**; religion is one of its group-scale forms. See D-16, Q-21. |
-| D-04 | Engine: **Unity C#**, Windows first, Android tablet maybe later. | Repo `CLAUDE.md` still describes a .NET WinForms *JobTracker*; it needs replacing before Phase 3 (implementation). |
+| D-04 | ~~Engine: **Unity C#**~~, Windows first, Android tablet maybe later. | ⚠ Engine superseded by D-41 (Unciv fork, Kotlin); C# is dropped. Platform order stays. Repo `CLAUDE.md` tech stack filled in on 2026-11-17 (Kotlin, Gradle, Unciv modules). |
 | D-05 | **LLM players** via Markdown: game emits `STATE.md`, LLM returns `RESPONSE.md`. | ⚠ Superseded for rivals by D-28 (coded rivals) and for the human side by D-29 (one-way advisor). |
 | D-06 | **Manual Bridge** first: the human copy-pastes/drag-drops between game and chat. No API. | Bridge = ritual. Revised by D-29: the bridge is now **one-way** (game → player's own LLM project) and optional. Still no API. |
 | D-07 | LLM rules live in a doc set: `SYSTEM_CORE.md`, `PROTOCOL_RESPONSE.md`, `WORLD_LOGIC.md`, `EVOLUTION_LIBRARY.md`. | |
@@ -38,7 +38,7 @@ Philosophy underneath: *everything is one mind's appearance, so everything is go
 | D-10 | Determinism is **fractal**: same rules at every scale; same choice → same hexagram. | Refined by D-20, D-21: the *rules* are deterministic, the *dice* are not (outside tests). |
 | D-11 | Four resources: **Material, Wealth, Knowledge, Culture.** | |
 | D-12 | **Valuation Engine** (C#, deterministic) prices LLM-invented concepts from their **tags**; LLM never sets costs. | Balance stays in code. |
-| D-13 | **Auto-Governor** executes the micro-management (builds, improvements) based on the chosen keyword/direction. | "Gardener" play style. |
+| D-13 | **Auto-Governor** executes the micro-management (builds, improvements) based on the chosen keyword/direction. | "Gardener" play style. ⚠ Deferred by D-38 (hands-on play first). |
 | D-14 | Name: **SYNTROPY: Order from Chaos.** | Repo is called *Flux*, which was the runner-up name. |
 | D-15 | **RPG elements are back in.** They were in the original request and dropped silently during the I Ching / Auto-Governor sessions. | 2026-11-17. *What* RPG means here is still open: Q-22. |
 | D-16 | The **ego illusion** (sense of a separate self) is a core driving force of people in the game, stronger than religion. | 2026-11-17. How it becomes a mechanic: Q-21. |
@@ -61,6 +61,14 @@ Philosophy underneath: *everything is one mind's appearance, so everything is go
 | D-33 | **Flexibility is derived, not a stat:** pick count = f(1 − ego). Guard against the rich-get-richer spiral = a **flow channel**: more picks bring more trembling lines and a more complex situation (challenge grows with skill); rigidity builds pressure until a break (many lines change at once), which humbles and drops ego (P2 flip, small-scale D-19). | 2026-11-17. Resolves the flexibility and spiral parts of Q-27. The exact f() and the fractal scale stay open. |
 | D-34 | **Turn pipeline: the dice offer, the player decides.** (1) The situation weights each line's odds (D-21, D-25). (2) The dice mark the **trembling lines** (candidates; working value 2–3 per turn, minimum 2, tunable). (3) Each trembling line shows its two keywords (D-32), shuffled, without line numbers, beside the situation summary. (4) The player places most/least picks: "most" = that line changes, "least" = that line is held. (5) Lines that actually flip are the **changing lines** (old yang / old yin); the realm moves to the new hexagram. **Trembling lines the player leaves unmarked are decided by the dice.** | 2026-11-17. Refines D-22. Rationale for the candidate stage: traditional coin casting gives on average 1.5 changing lines (~18% none, ~36% one), too few for a real choice. Low flexibility = fewer picks = more left to fate: ego shows as **loss of agency**, not as penalty points. |
 | D-35 | **Most + least on the same line cancel on the line, add on the profile.** The line is treated as unmarked (the dice decide); both profile signals count. Most = fitting + least = tempting → ego ↓↓ ("inner turn": the player changes themself, not the world). Most = tempting + least = fitting → ego ↑↑. | 2026-11-17. Gives the "let go of control" choice a real place in the game. Not farmable: a misread costs double and gives no agency over that line. |
+| D-36 | **Body and soul.** The **body** is a Civ-1-like economy (map, cities, population, production, research). The **soul** is the I Ching engine + profile (D-24). They couple at four points: (1) **trigrams → yields** (lower = inner: production, growth; upper = outer: trade, diplomacy, diffusion; D-09 made concrete); (2) **the picked keyword → the era's policy**: the tempting keyword gives better numbers *now* and a ricochet later, the fitting one pays slower and through cooperation (D-18, D-32: the economy is what makes the temptation real); (3) **ego + temperament → friction** (D-40); (4) **the body's state → line odds** (famine, surplus, monopoly, a neighbour's closeness push lines; D-21, D-25, input of Q-26). | 2026-11-17. Land gives Material and Wealth; people and buildings give Knowledge and Culture (D-11 split by source: the land feeds the body, minds feed the mind). Research unlocks concepts from the library by prerequisite tags (D-30). Trigram → yield table: Appendix B (draft). See §4 "Body and soul". |
+| D-37 | **Map: a simple hex tile map with cities.** Start simple, Civ-1-like scope, but hexes instead of squares. | 2026-11-17. Resolves Q-13: the map survives. Units, terrain list and city radius still open (Q-33). |
+| D-38 | **Hands-on play: the player chooses builds and research.** The Auto-Governor (D-13) is **deferred**. | 2026-11-17. Its other role, besides automation, was the **translation** of the picked keyword into economic action (the removed pre-D-28 loop: it received trigram traits and caps from the hexagram and spent resources by the chosen direction). That role must survive without the Governor: coupling points (1) and (2) of D-36. Mechanical form: Q-34. |
+| D-39 | **Two clocks.** A **turn** is an ordinary Civ-like turn: produce, build, research, move, fight. The hexagram stands still meanwhile, and world events pile up as pressure on the lines. A **generation** is the slow beat: the hexagram change through the Choice of Fate (D-34: trembling lines, most/least picks) and the profile update. Working value: every ~5 turns, earlier if the pressure crosses a threshold. **No calendar years are shown, only eras.** | 2026-11-17. Resolves Q-05. Wording fix (same day): where D-22, D-33, D-34, D-35 and Q-32 say "per turn" for trembling lines and picks, read **per generation**. Rationale: a hexagram changing every turn would make the "climate" too jumpy to plan a city around. Civ's non-linear time scale: parked (§6). |
+| D-40 | **Ego symptoms in the economy, by family** (never named in game, D-17). Confusion → **waste** (Material leaks; Civ 1 corruption/waste). Anger → **unrest** (a city stops producing; Civ 1 civil disorder). Pride → **research penalty** (foreign know-how is refused). Attachment → **trade income penalty** (hoarding, no investment, no exchange). Jealousy → **production penalty on shared work** (joint projects, contributions to another city's build, the cooperation bonus of P4), not on ordinary production. | 2026-11-17. Size of the penalty grows with group ego × city size/power (Civ 1 unhappiness scaled with size). Jealousy hits shared production because its wisdom is Accomplishing ("act together", Appendix A.1): the poison breaks exactly what the wisdom builds. Culture has no direct drain: Q-35. |
+| D-41 | **Engine: a fork of Unciv** (open-source Civ V clone, **Kotlin + libGDX + Gradle**, MPL-2.0), fork `zzt108/Unciv`, local `C:\Git\Unciv`. Unciv is the **body** (D-36, D-37: hex map, cities, yields, research, happiness/unrest, AI, saves, desktop + Android). The **soul** (Fate engine, most/least screen, weighted dice, Journal, Standstill/collapse) is our own Kotlin code. | 2026-11-17. Supersedes D-04's Unity C#. Resource mapping: Production (+Food) → Material, Gold → Wealth, Science → Knowledge, Culture → Culture (D-11); Faith unused (D-03). The existing `AiStatusExporter` in the fork is the seed of the advisor kit's state export (D-29). MPL-2.0: modified Unciv files stay MPL and open. |
+| D-42 | **Civ V content is trimmed by ruleset only during development**: whatever can be removed or disabled without a code change (religion, city-states, great people, spaceship, victory types, Civ V nations/leaders…) goes out through a custom ruleset/mod. Code changes for trimming come later, if at all. | 2026-11-17. Keeps the fork's diff against upstream small (D-43). What can't be removed by ruleset stays visible for now. |
+| D-43 | **The fork stays unofficial forever; own code hooks in with minimal upstream changes.** Upstream did not accept the earlier `AiStatusExporter`, so no upstream merge is planned. Rule: our code lives in our own packages; upstream files get only small, clearly marked hook points (as with `AiExportUIInjector`). | 2026-11-17. Purpose: pulling upstream changes into the fork stays cheap. The Fate engine core should be Gdx-independent and unit-testable. |
 
 ## 4. Core model (as understood so far)
 
@@ -81,7 +89,7 @@ RND --> IC : weighted draw of\n"trembling" lines
 @enduml
 ```
 
-### Turn pipeline (D-34, D-35, 2026-11-17)
+### Fate pipeline, once per generation (D-34, D-35, D-39, 2026-11-17)
 
 ```plantuml
 @startuml
@@ -109,58 +117,47 @@ stop
 @enduml
 ```
 
-### Who decides what (earlier LLM-centric view, ⚠ outdated by D-28, D-29)
+### Body and soul (D-36..D-40, 2026-11-17)
+
+Two clocks (D-39): the body runs every **turn** (build, research, move, fight), the soul moves every **generation** (hexagram change, most/least picks, profile update). Between two generations the hexagram stands, so its trigrams act as a stable climate the player plans around.
 
 ```plantuml
 @startuml
-skinparam componentStyle rectangle
-actor "Human\n(player + Bridge)" as H
-package "LLM side (the Mind)" {
-  [Rival realm persona] as AI
+package "Soul (every generation)" {
+  rectangle "Hexagram\n(lower + upper trigram)" as HX
+  rectangle "Profile\n(temperament + ego)" as PF
+  rectangle "Choice of Fate\n(most / least picks)" as CF
 }
-package "Game (C#, deterministic)" {
-  [Hexagram State Machine] as HSM
-  [Valuation Engine] as VE
-  [Auto-Governor] as AG
-  [Scribe: State to MD] as SC
-  [Interpreter: MD to commands] as IN
-  [Journal] as J
+package "Body (every turn)" {
+  rectangle "Hex map, cities,\npopulation" as MAP
+  rectangle "Yields:\nMaterial, Wealth (land)\nKnowledge, Culture (people)" as YLD
+  rectangle "Builds + research\n(player's hands)" as ACT
 }
-H --> HSM : picks keyword\n(changing line)
-SC --> H : STATE.md
-H --> AI : paste STATE.md
-AI --> H : RESPONSE.md
-H --> IN : paste RESPONSE.md
-IN --> VE : NEW_CONCEPT + tags
-IN --> HSM : rival's keyword
-HSM --> AG : trigram traits, caps
-VE --> AG : priced concepts
-AG --> J : what happened
+HX --> YLD : (1) trigram yield modifiers
+CF --> ACT : (2) era policy:\nfitting = slow gain,\ntempting = gain now + ricochet
+PF --> YLD : (3) friction: waste, unrest,\nresearch / trade / shared-work penalty
+MAP --> HX : (4) state pushes line odds\n(famine, surplus, monopoly)
+CF --> PF : pick pattern moves ego
+CF --> HX : changing lines flip
+MAP --> YLD
+YLD --> ACT
+ACT --> MAP
 @enduml
 ```
 
-One turn, as it was envisioned (⚠ outdated: superseded by the turn pipeline above):
+### Engine notes: hidden soul state in Unciv (D-41, 2026-11-17)
 
-```plantuml
-@startuml
-start
-:Show atmosphere of current hexagram\n(weather, whispers, trigram icons);
-:Offer 3-6 keywords\n(each = one possible changing line);
-:Human picks a keyword;
-:Scribe exports STATE.md for each LLM realm;
-:Human bridges STATE.md to chat and RESPONSE.md back;
-:Interpreter validates RESPONSE.md;
-if (valid?) then (yes)
-  :Register new concepts via Valuation Engine;
-else (no)
-  :Show error; human asks LLM to fix;
-endif
-:Flip lines: every realm moves to its new hexagram;
-:Auto-Governor spends resources by direction;
-:Journal records the turn;
-stop
-@enduml
-```
+The hexagram lines, ego and temperament can live as **stockpiled resources** that the player never sees (D-23). Checked in the code: a resource is kept out of the UI by these uniques/settings:
+
+| Leak point | Hidden by |
+|---|---|
+| World screen top bar, city screen, Resources overview, City overview | `Not shown on world screen` |
+| Civilopedia | `Will not be displayed in Civilopedia` |
+| Trade / diplomacy screen | `Cannot be traded` |
+| `AiStatusExporter` (advisor paste, D-29) | resource type **Bonus**: the exporter lists Strategic and Luxury only |
+| Effect lines under an event choice button (e.g. "Instantly gain [1] [Ego]") | `<hidden from users>` modifier on each effect unique |
+
+Not checked yet: notifications triggered by gains, and the save file (plain JSON, readable by anyone who looks; acceptable).
 
 ## 5. Open questions & tensions
 
@@ -173,7 +170,7 @@ Grouped by the session that should resolve them (§7). **Bold** = blocks other d
 - Q-04 Does the per-turn copy-paste **feed** flow (ritual) or **break** it (chore)? At what turn count does it become a chore?
 
 ### I Ching mechanic
-- **Q-05 Turn granularity:** does the hexagram change every turn, every era, or only on a keyword choice?
+- ~~Q-05 Turn granularity.~~ Resolved by D-39: years (economy) and generations (Choice of Fate).
 - **Q-26 How does the weighting work (D-21)?** *Partly resolved by D-34 (pipeline) and D-22/D-32 (DISC-like = forced choice between fitting and tempting keywords). Still open: the concrete situation → per-line odds function.* Original text: Candidate pipeline: *situation* (disturbing emotions, cooperation, monopoly) → per-line odds of becoming a changing line → random draw marks the "trembling" lines → player picks among them through keywords. Note: the traditional casting methods are already non-uniform (yarrow stalks vs. coins give different odds for old yin/old yang), so the odds are a natural tuning knob. Idea: in Standstill lines get "stuck" (low odds) while pressure builds; collapse = many lines changing at once. Open: what does "like the DISC test" mean for the player's choice (forced choice of most/least-fitting words?), and does the choice profile feed back into the weights?
 - Q-27 Profile feedback (D-22, D-23): axes settled by D-24, structure by D-31; flexibility = derived (D-33); spiral guard = flow channel (D-33). **Still open:** the exact f(1 − ego) and the ego step sizes per pick; is the profile fractal (character / group / realm, same two numbers at every scale)? Working assumption: yes.
 - **Q-32 Turn edge cases and content balance (D-34):** (a) Standstill: few lines tremble, how is the pressure shown? (b) Collapse: 5–6 trembling lines would mean 10–12 keywords. Proposal (not decided): fate takes most of them, the player steers only 1–2 lines. (c) Family balance over the 384 lines: no family should be nowhere or everywhere, and the share of same-family lines (4 of 24 in the sample) should be set on purpose. (d) Numbers: trembling count per turn, minimum, cap.
@@ -197,7 +194,11 @@ Grouped by the session that should resolve them (§7). **Bold** = blocks other d
 - ~~Q-24 What happens at monopolization?~~ Resolved: (b) Standstill + collapse, see D-19.
 - **Q-25 Mechanics of Standstill & collapse:** how long can a realm stay in Standstill, what builds the pressure (hidden disturbing emotions?), what does the collapse produce (successor realms, a dark age, lost concepts, cf. Q-11), and does the player play *through* it or watch it? Is monopoly measured per realm only, or fractally (a person, a guild, a belief monopolizing a group)? How does the player *see* it coming?
 - **Q-22 What does "RPG" mean here?** Options: (a) the player *is* one character (hero/sage/catalyst) inside the society; (b) a cast of named characters with social roles, traits and growth (session 1); (c) both. Strongly coupled to Q-01, Q-07 (hexagram per person?) and Q-13.
-- **Q-13 Does the map with units survive the pivot?** The Auto-Governor and keyword play suggest macro-only. P1 (diffusion, telephone-game distortion) needs space and agents.
+- ~~Q-13 Does the map with units survive the pivot?~~ Resolved by D-37: yes, a simple hex map with cities.
+- **Q-33 The body's first rules (D-36, D-37):** (a) Is food part of Material, or a separate stock that drives population growth (Civ 1 had food, shields, trade)? (b) Terrain list and city radius on hexes. (c) Units: settlers only at first, or also military/caravan-like units? Links Q-15.
+- **Q-34 Era policy without the Governor (D-38):** how does the picked keyword act on the body? Options: (a) a modifier set per keyword family for the whole generation (e.g. Discernment-fitting: +alliance, −short-term Wealth); (b) a suggested build/research focus the player may follow; (c) both. The ricochet of a tempting pick: immediate, delayed, or as line pressure only?
+- Q-35 Culture has no direct ego drain (D-40). Intended (Culture = memory, hit by collapse, cf. Q-11, Q-25), or should one family drain it?
+- Q-36 Trigram → yield table (Appendix B) is a draft: confirm or rework; size of the modifiers.
 - Q-14 Cooperation: is it emergent (session 2) or a mechanic with numbers (session 1: logarithmic group effect, overlapping coalitions)?
 - Q-15 Are there conflict and combat at all? If yes, how does war "feel" in a no-lose game?
 
@@ -223,6 +224,7 @@ Grouped by the session that should resolve them (§7). **Bold** = blocks other d
 - Art: minimalist, earth/pastel palette, "breathing" UI. Audio: generative ambient, silence allowed.
 - Logo: a hexagram resolving from chaos to order, left to right.
 - Advisor concept import (D-30, deferred): the player pastes a validated `NEW_CONCEPT` block proposed by their advisor back into the game; the Valuation Engine prices it. The only return channel from the LLM side.
+- Non-linear time scale (as in Civ: early eras span more time per turn). Not needed while only eras are shown (D-39); revisit if eras feel uneven.
 - Old phase plans (Gantt) from the source session: Protocol Design → Unity Foundation → Evolution & Emergence → Refinement & Flow. They are implementation plans, so they're out of scope for now.
 
 ## 7. Session roadmap (proposal)
@@ -247,6 +249,12 @@ Cheap trick worth trying early (still no code): **play a paper prototype in chat
 - *HallucInc notes* (deleted 2026-11-17): a Reddit post (r/ClaudeAI, "I built a free browser game with Claude Code") on a CLAUDE.md and sub-agent setup for an AI-built game. **Where it overlaps with `CLAUDE.md`, `CLAUDE.md` wins** (start-of-session reading = "re-read `.doc/` at every phase"; gated milestones = the 4-phase workflow with a stop after each phase; commit cadence = "commit only when the user asks", not "after each change"). Only one non-overlapping idea is kept for implementation: "same seed + same choices = same run" as a never-break rule (cf. D-10, Q-17). Its sub-agent workflow is **rejected**: no sub-agents in this project.
 
 ## 9. Decision log (append-only, newest on top)
+
+- **2026-11-17**: Unciv assessed as engine. Decided: Unciv fork in Kotlin (D-41, D-04's Unity C# dropped); Civ V content trimmed by ruleset only during development (D-42); fork stays unofficial, own code hooks in with minimal upstream changes (D-43). Hidden soul state can be stored as hidden stockpiled resources, see the note under §4 "Engine notes".
+
+- **2026-11-17**: D-39 wording fixed: "turn" = ordinary turn (build, research, move, fight), "generation" = hexagram change + most/least picks + profile update. Turn pipeline renamed to fate pipeline. The two outdated diagrams (LLM-centric "who decides what" and the old one-turn loop) removed from §4; §4 now holds 3 diagrams.
+
+- **2026-11-17**: The body gets designed: Civ-1-like economy coupled to the soul at four points (D-36); simple hex map with cities (D-37, Q-13 closed); hands-on builds and research, Auto-Governor deferred (D-38, D-13 marked); two clocks, turns and generations, eras only, no calendar years (D-39, Q-05 closed); ego symptoms as economic penalties per family (D-40). New questions Q-33..Q-36, body/soul diagram in §4, trigram → yield draft in Appendix B.
 
 - **2026-11-17**: Profile structure agreed: temperament + single ego scalar (D-31); ego measured by situation fit via fitting/tempting keyword pairs (D-32); flexibility derived, flow channel against the spiral (D-33); turn pipeline with trembling lines and fate for unmarked lines (D-34); most + least on one line cancel on the line, add on the profile (D-35). Q-23 closed; Q-21, Q-26, Q-27 narrowed; new Q-32. Turn pipeline diagram added to §4, sample mapping of HG 1, 2, 11, 12 in Appendix A.
 
@@ -329,3 +337,20 @@ Trial run for D-32 on four hexagrams. The keywords are our own phrasing (Q-08), 
 3. **A hexagram's temptations tell its story.** Standstill tempts mostly with Attachment (positioning, deals, comfort near power): the monopolization trap of D-19, unprompted.
 4. **Balance is uneven, and that's fine locally.** Confusion is absent from 11 and 12; Pride tempts often. Check the full 384 globally (Q-32 c).
 5. **Worked example (D-34):** HG 12, lines 3 and 5 tremble, 1 most + 1 least. Most = "Own the shame", least = "It's over, relax" → line 3 changes (Earth → Mountain below), line 5 held → **HG 33 Retreat**; ego ↓ twice. Had line 5 been unmarked and flipped by the dice → **HG 56 The Wanderer**.
+
+## Appendix B. Trigram → yield, draft (2026-11-17)
+
+Draft for D-36 coupling point (1), not decided (Q-36). The **lower** trigram modifies the inner side (what the realm produces and how it grows), the **upper** trigram the outer side (how it meets the neighbours).
+
+| Trigram | Quality | Inner effect (lower) | Outer effect (upper) |
+|---|---|---|---|
+| ☰ Heaven | creative strength | + Knowledge | assertive: more influence, more monopoly pressure |
+| ☷ Earth | receptive, nourishing | + Material, growth | open, accommodating: easier alliances |
+| ☳ Thunder | arousing, movement | + expansion (new cities) | sudden contact, border friction |
+| ☵ Water | danger, flowing | + Wealth flow, with risk | risky but rich trade routes |
+| ☶ Mountain | keeping still | + preservation, defence, slower growth | closed borders, little diffusion |
+| ☴ Wind | gentle penetration | + slow, steady improvement | + diffusion of knowledge and culture (P1) |
+| ☲ Fire | clarity, clinging | + Culture | visibility: neighbours copy and envy |
+| ☱ Lake | joy, exchange | + contentment (less unrest) | + trade income |
+
+Reading check: **HG 11 Peace** (Heaven below, Earth above) = thinking at home, open and nourishing outward. **HG 12 Standstill** (Earth below, Heaven above) = only matter at home, pushing outward: the hegemon of D-19.

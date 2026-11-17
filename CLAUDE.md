@@ -5,9 +5,12 @@ Memory lives in Markdown files under `.doc/`, never in chat history: always re-r
 
 ## Project
 
-- Tech stack: TBD, solution `TBD.slnx`.
-- Projects: `TBD`, `TBD.Tests` (xUnit?), `TBD.Installer`.
-- Build: `TBD` · Test: `TBD`
+- Tech stack: **Kotlin + libGDX**, Gradle (Kotlin DSL), JDK 21. The game is a fork of **Unciv**: `zzt108/Unciv`, local checkout `C:\Git\Unciv` (D-41 in `.doc/26-11-17 Game design brainstorming/brainstorming-base.md`). Root build: `C:\Git\Unciv\settings.gradle.kts`.
+- Repos: **Flux** (this repo) = design docs (`.doc/`) only; **Unciv fork** = all source code. Unciv's upstream docs: `C:\Git\Unciv\docs\` (modding: `docs/Modders/`, building: `docs/Developers/Building-Locally.md`).
+- Gradle modules: `core` (game logic + UI; own SYNTROPY code goes in its own packages), `tests` (JUnit 4), `desktop` (Windows launcher + packaging, `desktop:dist` / `packr*`), `android` (only included when an Android SDK is found), `server` (multiplayer server, unused for now).
+- Content: SYNTROPY ruleset/mod as JSON (Unciv mod format); Civ V content is trimmed by ruleset only during development (D-42).
+- Fork rule (D-43): never upstreamed; upstream files get only small, clearly marked hook points; the Fate engine core stays Gdx-independent and unit-testable.
+- Build: `./gradlew desktop:dist` (jar in `desktop/build/libs/`) · Run: `./gradlew desktop:run` · Test: `./gradlew tests:test` — all from `C:\Git\Unciv`.
 - `.doc/context_state.md` — architecture/status diagrams (update when architecture changes).
 - `.doc/plans-issues.md` — backlog of ideas and issues.
 
