@@ -1,6 +1,7 @@
 package com.unciv.logic.civilization.diplomacy
 
 import com.unciv.Constants
+import com.unciv.logic.automation.Timers.Companion.timeThis
 import com.unciv.logic.civilization.DiplomacyAction
 import com.unciv.logic.civilization.NotificationCategory
 import com.unciv.logic.civilization.NotificationIcon
@@ -16,15 +17,15 @@ import kotlin.math.min
 
 object DiplomacyTurnManager {
 
-    fun DiplomacyManager.nextTurn() {
+    fun DiplomacyManager.nextTurn():Unit = timeThis("DiplomacyManager.nextTurn") {
         nextTurnTrades()
         removeUntenableTrades()
         updateHasOpenBorders()
         nextTurnDiplomaticModifiers()
         nextTurnFlags()
-        if (civInfo.isCityState && otherCiv.isMajorCiv())
+        if (civInfo.isCityState && otherCiv.isMajorCiv)
             nextTurnCityStateInfluence()
-        if (civInfo.isMajorCiv())
+        if (civInfo.isMajorCiv)
             saveSmoothedOpinionOfOtherCiv()
     }
 
@@ -73,7 +74,7 @@ object DiplomacyTurnManager {
             TradeOffer(Constants.peaceTreaty, TradeOfferType.Treaty, duration = durationLeft)
         )
         trades.add(treaty)
-        otherCiv.getDiplomacyManager(civInfo)!!.trades.add(treaty)
+        otherCiv.getDiplomacyManager(civInfo)!!.trades.add(treaty.reverse())
     }
 
 
@@ -90,6 +91,15 @@ object DiplomacyTurnManager {
         } else if (influence < restingPoint) {
             val increment = getCityStateInfluenceRecovery()
             setInfluence(min(restingPoint, influence + increment))
+        }
+        
+        if (civInfo.cityStateFunctions.getTributeWillingness(otherCiv) > 0
+            && otherCiv.hasUnique(UniqueType.CityStateInfluenceGainWhenAfraid)) {
+            var scaredInfluenceGain = 0.0f
+            otherCiv.forEachMatchingUnique(UniqueType.CityStateInfluenceGainWhenAfraid) {
+                    unique -> scaredInfluenceGain += unique.params[0].toFloat()
+            }
+            addInfluence(scaredInfluenceGain)
         }
 
         if (!civInfo.isDefeated()) { // don't display city state relationship notifications when the city state is currently defeated
@@ -108,7 +118,7 @@ object DiplomacyTurnManager {
             if (getInfluence() < 30  // We usually don't want to bully our friends
                 && !hasFlag(DiplomacyFlags.NotifiedAfraid)
                 && civInfo.cityStateFunctions.getTributeWillingness(otherCiv) > 0
-                && otherCiv.isMajorCiv()
+                && otherCiv.isMajorCiv
             ) {
                 setFlag(DiplomacyFlags.NotifiedAfraid, 20)  // Wait 20 turns until next reminder
                 val text = "[${civInfo.civName}] is afraid of your military power!"
@@ -143,7 +153,7 @@ object DiplomacyTurnManager {
             flagsCountdown[flag] = flagsCountdown[flag]!! - 1
 
             // If we have uniques that make city states grant military units faster when at war with a common enemy, add higher numbers to this flag
-            if (flag == DiplomacyFlags.ProvideMilitaryUnit.name && civInfo.isMajorCiv() && otherCiv.isCityState &&
+            if (flag == DiplomacyFlags.ProvideMilitaryUnit.name && civInfo.isMajorCiv && otherCiv.isCityState &&
                 civInfo.gameInfo.civilizations.any { civInfo.isAtWarWith(it) && otherCiv.isAtWarWith(it) }) {
                 for (unique in civInfo.getMatchingUniques(UniqueType.CityStateMoreGiftedUnits)) {
                     flagsCountdown[DiplomacyFlags.ProvideMilitaryUnit.name] =
@@ -268,6 +278,7 @@ object DiplomacyTurnManager {
     }
 
     private fun DiplomacyManager.nextTurnDiplomaticModifiers() {
+        val rng = state.stateBasedRandom("DiplomacyManager.nextTurnDiplomaticModifiers")
         if (diplomaticStatus == DiplomaticStatus.Peace)
             accumulateToAtMost(DiplomaticModifiers.YearsOfPeace, 0.5f, 30f)
         else
@@ -286,12 +297,14 @@ object DiplomacyTurnManager {
         revertToZero(DiplomaticModifiers.BetrayedDeclarationOfFriendship, 1 / 8f) // That's a bastardly thing to do
         revertToZero(DiplomaticModifiers.BetrayedDefensivePact, 1 / 16f) // That's an outrageous thing to do
         revertToZero(DiplomaticModifiers.RefusedToNotSettleCitiesNearUs, 1 / 4f)
+        revertToZero(DiplomaticModifiers.RefusedToPromiseNotToAttackUs, 1 / 2f)
         revertToZero(DiplomaticModifiers.BulliedProtectedMinor, 1 / 2f) // Decays at same rate as warmongering
         revertToZero(DiplomaticModifiers.AttackedProtectedMinor, 1 / 2f) // Decays at same rate as warmongering
         revertToZero(DiplomaticModifiers.DestroyedProtectedMinor, 1 / 4f) // Decays slower, similar to capturing cities
         for (demand in Demand.entries) {
-            revertToZero(demand.betrayedPromiseDiplomacyMpodifier, 1 / 8f)
+            revertToZero(demand.betrayedPromiseDiplomacyModifier, 1 / 8f)
         }
+        revertToZero(DiplomaticModifiers.BetrayedPromiseToNotAttackOtherCiv, 1 / 8f) // betrayals are remembered for a long time
         revertToZero(DiplomaticModifiers.UnacceptableDemands, 1 / 4f)
         revertToZero(DiplomaticModifiers.StealingTerritory, 1 / 4f)
         revertToZero(DiplomaticModifiers.DenouncedOurAllies, 1 / 4f)
@@ -304,14 +317,14 @@ object DiplomacyTurnManager {
         revertToZero(DiplomaticModifiers.GaveUsUnits, 1 / 4f)
         revertToZero(DiplomaticModifiers.LiberatedCity, 1 / 8f)
         if (hasModifier(DiplomaticModifiers.GaveUsGifts)) {
-            val giftLoss = when {
-                relationshipLevel() == RelationshipLevel.Ally -> 1f
-                relationshipLevel() == RelationshipLevel.Friend -> 1.5f
-                relationshipLevel() == RelationshipLevel.Favorable -> 2f
-                relationshipLevel() == RelationshipLevel.Neutral -> 2.5f
-                relationshipLevel() == RelationshipLevel.Competitor -> 5f
-                relationshipLevel() == RelationshipLevel.Enemy -> 7.5f
-                relationshipLevel() == RelationshipLevel.Unforgivable -> 10f
+            val giftLoss = when (relationshipLevel()) {
+                RelationshipLevel.Ally -> 1f
+                RelationshipLevel.Friend -> 1.5f
+                RelationshipLevel.Favorable -> 2f
+                RelationshipLevel.Neutral -> 2.5f
+                RelationshipLevel.Competitor -> 5f
+                RelationshipLevel.Enemy -> 7.5f
+                RelationshipLevel.Unforgivable -> 10f
                 else -> 2.5f
             } * civInfo.gameInfo.ruleset.modOptions.constants.goldGiftDegradationMultiplier
             // We should subtract a certain amount from this balanced each turn
@@ -337,13 +350,14 @@ object DiplomacyTurnManager {
 
         if (!otherCiv.isCityState) return
 
-        if (isRelationshipLevelLT(RelationshipLevel.Friend)) {
+        // Only a major can be a city-state's patron: friendly city-states must not gift each other units
+        if (!civInfo.isMajorCiv || isRelationshipLevelLT(RelationshipLevel.Friend)) {
             if (hasFlag(DiplomacyFlags.ProvideMilitaryUnit))
                 removeFlag(DiplomacyFlags.ProvideMilitaryUnit)
             return
         }
 
-        val variance = listOf(-1, 0, 1).random()
+        val variance = listOf(-1, 0, 1).random(rng)
 
         val provideMilitaryUnitUniques = CityStateFunctions
             .getCityStateBonuses(otherCiv.cityStateType, relationshipIgnoreAfraid(), UniqueType.CityStateMilitaryUnits)

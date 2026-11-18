@@ -48,9 +48,14 @@ class Terrain : RulesetStatsObject() {
     @Transient
     var damagePerTurn = 0
 
-    // Shouldn't this just be a lazy property so it's automatically cached?
-    @Readonly
-    fun isRough(): Boolean = hasUnique(UniqueType.RoughTerrain)
+    val isRough: Boolean by lazy { hasUnique(UniqueType.RoughTerrain) }
+    val isMountain by lazy { hasUnique(UniqueType.OccursInChains) }
+    val isHill by lazy { hasUnique(UniqueType.OccursInGroups) }
+    val isFreshwater: Boolean by lazy { hasUnique(UniqueType.FreshWater) }
+    val isCoast: Boolean by lazy { type == TerrainType.Water && !isFreshwater && (hasUnique(UniqueType.CoastalWater) || name == Constants.coast) }
+    val isOcean: Boolean by lazy { type == TerrainType.Water && !isFreshwater && !isCoast }
+    val isVegetation by lazy { hasUnique(UniqueType.Vegetation) }
+    val isIce by lazy { type == TerrainType.TerrainFeature && impassable && occursOn.contains(Constants.ocean) }
 
     /** Tests base terrains, features and natural wonders whether they should be treated as Land/Water.
      *  Currently only used for civilopedia display, as other code can test the tile itself.
@@ -134,7 +139,7 @@ class Terrain : RulesetStatsObject() {
 
         textList += FormattedLine()
         // For now, natural wonders show no "open terrain" - may change later
-        if (turnsInto == null && displayAs(TerrainType.Land, ruleset) && !isRough())
+        if (turnsInto == null && displayAs(TerrainType.Land, ruleset) && !isRough)
             textList += FormattedLine("Open terrain")   // Rough is in uniques
         uniquesToCivilopediaTextLines(textList, leadingSeparator = null)
 
@@ -146,11 +151,8 @@ class Terrain : RulesetStatsObject() {
             textList += FormattedLine("{Defence bonus}: ${(defenceBonus * 100).toInt()}%")
 
         val seeAlso = (ruleset.buildings.values.asSequence() + ruleset.units.values.asSequence())
-            .filter {
-                construction -> construction.uniqueObjects.any {
-                    unique -> unique.params.any { it == name }
-                }
-            }.map { FormattedLine(it.name, it.makeLink(), indent=1) } +
+            .filter { construction -> construction.hasUniquesMentioning(name) }
+            .map { FormattedLine(it.name, it.makeLink(), indent=1) } +
             Belief.getCivilopediaTextMatching(name, ruleset, false)
         if (seeAlso.any()) {
             textList += FormattedLine()
@@ -190,11 +192,12 @@ class Terrain : RulesetStatsObject() {
         return when (filter) {
             "all", "All" -> true
             "Terrain" -> true
-            "Open terrain" -> !isRough()
-            "Rough terrain" -> isRough()
+            Constants.impassable -> impassable
+            "Open terrain" -> !isRough
+            "Rough terrain" -> isRough
             "Natural Wonder" -> type == TerrainType.NaturalWonder
             "Terrain Feature" -> type == TerrainType.TerrainFeature
-            else -> when(filter){ // non-constants
+            else -> when(filter) { // non-constants
                 name -> true
                 type.name -> true
                 else -> false

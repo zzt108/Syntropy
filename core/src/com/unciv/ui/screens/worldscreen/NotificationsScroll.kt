@@ -3,6 +3,7 @@ package com.unciv.ui.screens.worldscreen
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.actions.TemporalAction
@@ -19,17 +20,18 @@ import com.unciv.logic.civilization.NotificationCategory
 import com.unciv.models.translations.tr
 import com.unciv.ui.components.MayaCalendar.toMayaNumerals
 import com.unciv.ui.components.extensions.packIfNeeded
+import com.unciv.ui.components.extensions.removeFontColorFromStatIcons
 import com.unciv.ui.components.extensions.surroundWithCircle
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.input.onClick
-import com.unciv.ui.components.input.onRightClick
 import com.unciv.ui.components.widgets.ColorMarkupLabel
 import com.unciv.ui.components.widgets.WrappableLabel
-import com.unciv.ui.images.IconCircleGroup
+import com.unciv.ui.components.widgets.IconCircleGroup
 import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.screens.basescreen.BaseScreen
 import com.unciv.ui.screens.basescreen.BaseScreen.Companion.skinStrings
 import com.unciv.ui.screens.overviewscreen.EmpireOverviewCategories
+import com.unciv.utils.withHash
 import yairm210.purity.annotations.Pure
 import com.unciv.ui.components.widgets.AutoScrollPane as ScrollPane
 
@@ -89,7 +91,6 @@ class NotificationsScroll(
 
     //region private fields
     private var notificationsHash: Int = 0
-    internal val hiddenNotifications = HashSet<Notification>()
 
     private var notificationsTable = Table()
     private var topSpacerCell: Cell<Actor?>? = null
@@ -230,8 +231,7 @@ class NotificationsScroll(
         // Detect what to draw and if there's any changes part 1
         if (oneTimeNotification == null && clickedNotification != null)
             oneTimeNotification = clickedNotification  // reselecting can keep a "one-time" in the list
-
-        val newHash = updateNotificationsHash(notifications, oneTimeNotification)
+        val newHash = notifications.hashCode().withHash(oneTimeNotification.hashCode())
 
         // Determine highlight
         coloredHighlight = false
@@ -269,7 +269,7 @@ class NotificationsScroll(
 
         val backgroundDrawable = BaseScreen.skinStrings.getUiBackground("WorldScreen/Notification", BaseScreen.skinStrings.roundedEdgeRectangleShape)
 
-        val orderedNotifications = (additionalNotification + notifications.asReversed())
+        val orderedNotifications = (additionalNotification + notifications)
             .groupBy { it.category }
             .toSortedMap()  // This sorts by Category ordinal, so far intentional - the order of the grouped lists are unaffected
         for ((category, categoryNotifications) in orderedNotifications) {
@@ -288,8 +288,7 @@ class NotificationsScroll(
             val notificationCategoryTable = Table()
 
             fun fillNotificationCategoryTable() {
-                val visibleNotifications = categoryNotifications.filter { it !in hiddenNotifications }
-                for (notification in visibleNotifications) {
+                for (notification in categoryNotifications) {
                     val item = ListItem(notification, backgroundDrawable)
                     itemWidths.add(item.itemWidth)
                     val itemCell = notificationCategoryTable.add(item)
@@ -302,9 +301,7 @@ class NotificationsScroll(
             notificationsTable.add(notificationCategoryTable).right().row()
 
             header?.onClick {
-                if (restoreHiddenInCategory(category)) {
-                    // Category was restored, world will re-render
-                } else if (notificationCategoryTable.hasChildren()) {
+                if (notificationCategoryTable.hasChildren()) {
                     notificationCategoryTable.clear()
                     notificationCategoryTable.pack()
                 } else {
@@ -312,6 +309,7 @@ class NotificationsScroll(
                     notificationCategoryTable.pack()
                 }
             }
+            com.unciv.syntropy.ui.NotificationHooks.categoryHeader(header, category)  // SYNTROPY-HOOK
         }
 
         // I think average looks better than max or non-equalized
@@ -392,6 +390,7 @@ class NotificationsScroll(
             val maxLabelWidth = maxEntryWidth - (itemIconSize + 5f) * notification.icons.size - 10f
             val label = WrappableLabel(notification.text, maxLabelWidth, ImageGetter.CHARCOAL, labelFontSize, hideIcons = true)
             label.setAlignment(Align.center)
+            label.removeFontColorFromStatIcons()
             if (label.prefWidth > maxLabelWidth * scaleFactor) {  // can't explain why the comparison needs scaleFactor
                 label.wrap = true
                 listItem.add(label).maxWidth(label.optimizePrefWidth()).padRight(10f)
@@ -412,9 +411,7 @@ class NotificationsScroll(
                 clickedNotification = notification
                 GUI.setUpdateWorldOnNextRender()
             }
-            onRightClick {
-                hideNotification(notification)
-            }
+            com.unciv.syntropy.ui.NotificationHooks.listItem(this, notification)  // SYNTROPY-HOOK
         }
     }
 
@@ -443,7 +440,7 @@ class NotificationsScroll(
         restoreButton.checkScrollX(pixelsX)
     }
 
-    inner class RestoreButton : Container<IconCircleGroup>() {
+    inner class RestoreButton : Container<IconCircleGroup<Group>>() {
         private var blockCheck = true
         private var blockAct = true
         private var active = false

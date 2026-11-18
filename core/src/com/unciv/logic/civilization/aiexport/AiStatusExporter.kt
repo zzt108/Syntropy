@@ -27,7 +27,7 @@ object AiStatusExporter {
      * concurrently.
      */
     fun generateAiStatusReport(civ: Civilization, includeSystemContext: Boolean = true): String {
-        if (civ.isSpectator()) {
+        if (civ.isSpectator) {
             return "Spectator mode - no civilization data available."
         }
 

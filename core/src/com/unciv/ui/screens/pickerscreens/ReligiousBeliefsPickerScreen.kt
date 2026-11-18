@@ -54,7 +54,7 @@ class ReligiousBeliefsPickerScreen (
     private var rightSelection = Selection()
 
     private val currentReligion = choosingCiv.religionManager.religion
-        ?: Religion("None", gameInfo, choosingCiv)
+        ?: Religion("None", gameInfo, choosingCiv, gameInfo.turns)
 
     init {
         leftChosenBeliefs.defaults().right().pad(10f).fillX()
@@ -222,6 +222,9 @@ class ReligiousBeliefsPickerScreen (
                 }
                 belief.getMatchingUniques(UniqueType.OnlyAvailable, GameContext.IgnoreConditionals)
                     .any { !it.conditionalsApply(choosingCiv.state) } ->
+                    // The Belief is blocked
+                    beliefButton.disable(redDisableColor)
+                belief.getMatchingUniques(UniqueType.Unavailable, choosingCiv.state).any() ->
                     // The Belief is blocked
                     beliefButton.disable(redDisableColor)
 

@@ -1,11 +1,14 @@
 package com.unciv.logic.civilization.managers
 
+import com.unciv.models.metadata.GameSettings
+import com.unciv.view.GameView
 import com.unciv.UncivGame
 import com.unciv.logic.VictoryData
 import com.unciv.logic.automation.civilization.NextTurnAutomation
 import com.unciv.logic.city.managers.CityTurnManager
 import com.unciv.logic.civilization.*
 import com.unciv.logic.civilization.diplomacy.DiplomacyTurnManager.nextTurn
+import com.unciv.logic.map.mapunit.MapUnit
 import com.unciv.logic.map.mapunit.UnitTurnManager
 import com.unciv.logic.map.tile.Tile
 import com.unciv.logic.trade.TradeEvaluation
@@ -18,18 +21,15 @@ import com.unciv.ui.screens.worldscreen.status.NextTurnProgress
 import com.unciv.utils.Log
 import yairm210.purity.annotations.Readonly
 import kotlin.math.min
-import kotlin.random.Random
+import com.unciv.logic.automation.Timers.Companion.timeThis
 
 class TurnManager(val civInfo: Civilization) {
 
 
-    fun startTurn(progressBar: NextTurnProgress? = null) {
-        if (civInfo.isSpectator()) return
+    fun startTurn(progressBar: NextTurnProgress? = null):Unit = timeThis("TurnManager.startTurn") {
+        if (civInfo.isSpectator) return
 
-        civInfo.threatManager.clear()
-        if (civInfo.isMajorCiv() && civInfo.isAlive()) {
-            civInfo.statsHistory.recordRankingStats(civInfo)
-        }
+        for (city in civInfo.cities) city.hasSoldBuildingThisTurn = false
 
         if (civInfo.cities.isNotEmpty() && civInfo.gameInfo.ruleset.technologies.isNotEmpty())
             civInfo.tech.updateResearchProgress()
@@ -44,7 +44,7 @@ class TurnManager(val civInfo: Civilization) {
 
         // Do this after updateStatsForNextTurn but before cities.startTurn
         if (civInfo.playerType == PlayerType.AI && civInfo.gameInfo.ruleset.modOptions.hasUnique(UniqueType.ConvertGoldToScience))
-            NextTurnAutomation.automateGoldToSciencePercentage(civInfo)
+            NextTurnAutomation.automateGoldToSciencePercentage(GameView(civInfo.gameInfo, civInfo).civView)
 
         // Generate great people at the start of the turn,
         // so they won't be generated out in the open and vulnerable to enemy attacks before you can control them
@@ -65,8 +65,9 @@ class TurnManager(val civInfo: Civilization) {
         startTurnFlags()
         updateRevolts()
 
-        for (unique in civInfo.getTriggeredUniques(UniqueType.TriggerUponTurnStart, civInfo.state, ignoreCities = true))
+        civInfo.forEachTriggeredUnique(UniqueType.TriggerUponTurnStart, civInfo.state, ignoreCities = true) { unique ->
             UniqueTriggerActivation.triggerUnique(unique, civInfo)
+        }
 
         for (city in civInfo.cities) {
             progressBar?.increment()
@@ -91,11 +92,29 @@ class TurnManager(val civInfo: Civilization) {
                 civInfo.notifications.removeAll { it.text == "[${offeringCiv.civName}] has made a counteroffer to your trade request" }
             }
         }
-        
-        for (unit in civInfo.units.getCivUnits().filter { it.promotions.canBePromoted() }){
-            civInfo.addNotification("[${unit.displayName()}] can be promoted!",
-                listOf(MapUnitAction(unit), PromoteUnitAction(unit)),
-                NotificationCategory.Units, unit.name)
+
+        val promotableUnits = civInfo.units.getCivUnits()
+            .filter { it.promotions.canBePromoted() }
+            .toList()
+        if (UncivGame.Current.settings.automaticPromotions == GameSettings.AutomaticPromotions.ForAllUnits) {
+            val gameView = GameView(civInfo.gameInfo, civInfo)
+            for (unit in promotableUnits) NextTurnAutomation.applyPromotions(gameView.getMapUnitView(unit))
+        } else if (promotableUnits.size <= 3) {
+            for (unit in promotableUnits) {
+                civInfo.addNotification(
+                    "[${unit.displayName()}] can be promoted!",
+                    listOf(MapUnitAction(unit), PromoteUnitAction(unit)),
+                    NotificationCategory.Units,
+                    unit.name
+                )
+            }
+        } else {
+            civInfo.addNotification(
+                "[${promotableUnits.size}] units can be promoted!",
+                promotableUnits.map { MapUnitAction(it) },
+                NotificationCategory.Units,
+                "UnitActionIcons/Promote"
+            )
         }
 
         updateWinningCiv()
@@ -108,9 +127,10 @@ class TurnManager(val civInfo: Civilization) {
             if (!civInfo.flagsCountdown.containsKey(flag)) continue
 
             if (flag == CivFlags.CityStateGreatPersonGift.name) {
+                val rng = civInfo.state.stateBasedRandom("TurnManager.startTurnFlags")
                 val cityStateAllies: List<Civilization> =
                         civInfo.getKnownCivs().filter { it.isCityState && it.allyCiv == civInfo }.toList()
-                val givingCityState = cityStateAllies.filter { it.cities.isNotEmpty() }.randomOrNull()
+                val givingCityState = cityStateAllies.filter { it.cities.isNotEmpty() }.randomOrNull(rng)
 
                 if (cityStateAllies.isNotEmpty()) civInfo.flagsCountdown[flag] = civInfo.flagsCountdown[flag]!! - 1
 
@@ -140,6 +160,7 @@ class TurnManager(val civInfo: Civilization) {
     private fun handleDiplomaticVictoryFlags() {
         if (civInfo.flagsCountdown[CivFlags.ShouldResetDiplomaticVotes.name] == 0) {
             civInfo.gameInfo.diplomaticVictoryVotesCast.clear()
+            civInfo.gameInfo.diplomaticVictoryVotesProcessed = false
             civInfo.removeFlag(CivFlags.ShowDiplomaticVotingResults.name)
             civInfo.removeFlag(CivFlags.ShouldResetDiplomaticVotes.name)
         }
@@ -187,7 +208,7 @@ class TurnManager(val civInfo: Civilization) {
             return
         }
 
-        val random = Random.Default
+        val random = civInfo.state.stateBasedRandom("TurnManager.doRevoltSpawn")
         val rebelCount = 1 + random.nextInt(100 + 20 * (civInfo.cities.size - 1)) / 100
         val spawnCity = civInfo.cities.maxByOrNull { random.nextInt(it.population.population + 10) } ?: return
         val spawnTile = spawnCity.getTiles().maxByOrNull { rateTileForRevoltSpawn(it) } ?: return
@@ -231,16 +252,17 @@ class TurnManager(val civInfo: Civilization) {
     
     @Readonly
     private fun getTurnsBeforeRevolt() =
-        ((civInfo.gameInfo.ruleset.modOptions.constants.baseTurnsUntilRevolt + Random.Default.nextInt(3)) 
+        ((civInfo.gameInfo.ruleset.modOptions.constants.baseTurnsUntilRevolt + civInfo.state.stateBasedRandom("TurnManager.getTurnsBeforeRevolt").nextInt(3)) 
             * civInfo.gameInfo.speed.modifier.coerceAtLeast(1f)).toInt()
 
 
-    fun endTurn(progressBar: NextTurnProgress? = null) {
+    fun endTurn(progressBar: NextTurnProgress? = null):Unit = timeThis("TurnManager.endTurn") {
         if (UncivGame.Current.settings.citiesAutoBombardAtEndOfTurn)
-            NextTurnAutomation.automateCityBombardment(civInfo) // Bombard with all cities that haven't, maybe you missed one
+            NextTurnAutomation.automateCityBombardment(GameView(civInfo.gameInfo, civInfo).civView) // Bombard with all cities that haven't, maybe you missed one
 
-        for (unique in civInfo.getTriggeredUniques(UniqueType.TriggerUponTurnEnd, civInfo.state, ignoreCities = true))
+        civInfo.forEachTriggeredUnique(UniqueType.TriggerUponTurnEnd, civInfo.state, ignoreCities = true) { unique ->
             UniqueTriggerActivation.triggerUnique(unique, civInfo)
+        }
 
         val notificationsLog = civInfo.notificationsLog
         val notificationsThisTurn = Civilization.NotificationsLog(civInfo.gameInfo.turns)
@@ -256,7 +278,7 @@ class TurnManager(val civInfo: Civilization) {
         civInfo.notifications.clear()
         civInfo.notificationCountAtStartTurn = null
 
-        if (civInfo.isDefeated() || civInfo.isSpectator()) return  // yes they do call this, best not update any further stuff
+        if (civInfo.isDefeated() || civInfo.isSpectator) return  // yes they do call this, best not update any further stuff
         
         var nextTurnStats =
             if (civInfo.isBarbarian)
@@ -275,23 +297,28 @@ class TurnManager(val civInfo: Civilization) {
             // Set turns to elections to a random number so not every city-state has the same election date
             // May be called at game start or when migrating a game from an older version
             if (civInfo.gameInfo.isEspionageEnabled() && !civInfo.hasFlag(CivFlags.TurnsTillCityStateElection.name)) {
-                civInfo.addFlag(CivFlags.TurnsTillCityStateElection.name, Random.nextInt(civInfo.gameInfo.ruleset.modOptions.constants.cityStateElectionTurns + 1))
+                val rng = civInfo.state.stateBasedRandom("TurnManager.endTurn(Espianage)")
+                civInfo.addFlag(CivFlags.TurnsTillCityStateElection.name, rng.nextInt(civInfo.gameInfo.ruleset.modOptions.constants.cityStateElectionTurns + 1))
             }
         }
 
-        // disband units until there are none left OR the gold values are normal
-        if (!civInfo.isBarbarian && civInfo.gold <= -200 && nextTurnStats.gold.toInt() < 0) {
-            do {
-                val militaryUnits = civInfo.units.getCivUnits().filter { it.isMilitary() }  // New sequence as disband replaces unitList
-                val unitToDisband = militaryUnits.minByOrNull { it.baseUnit.cost }
-                    // or .firstOrNull()?
+        if (! civInfo.isBarbarian) {
+            // disband military units until there are none left OR the gold values are normal
+            while (civInfo.gold <= -200 && nextTurnStats.gold.toInt() < 0) {
+                // prioritize units inside our territory, because disbanding them yields gold, and inexperienced units
+                val priorities = compareByDescending<MapUnit> { it.currentTile.getOwner() == civInfo }
+                    .thenBy { it.promotions.valueOfPromotionsAndXp() }
+                val unitToDisband = civInfo.units.getCivUnits()
+                    .filter { it.isMilitary() }
+                    .sortedWith(priorities)
+                    .firstOrNull()
                     ?: break
                 unitToDisband.disband()
                 val unitName = unitToDisband.shortDisplayName()
                 civInfo.addNotification("Cannot provide unit upkeep for $unitName - unit has been disbanded!", NotificationCategory.Units, unitName, NotificationIcon.Death)
                 // No need to recalculate unit upkeep, disband did that in UnitManager.removeUnit
                 nextTurnStats = civInfo.stats.statsForNextTurn
-            } while (civInfo.gold <= -200 && nextTurnStats.gold.toInt() < 0)
+            }
         }
 
         civInfo.addGold(nextTurnStats.gold.toInt() )
@@ -304,7 +331,7 @@ class TurnManager(val civInfo: Civilization) {
 
         civInfo.espionageManager.endTurn()
 
-        if (civInfo.isMajorCiv()) // City-states don't get great people!
+        if (civInfo.isMajorCiv) // City-states don't get great people!
             civInfo.greatPeople.addGreatPersonPoints()
 
         // To handle tile's owner issue (#8246), we need to run cities being razed first.
@@ -324,6 +351,8 @@ class TurnManager(val civInfo: Civilization) {
         civInfo.resetMilitaryMightCache()
 
         updateWinningCiv() // Maybe we did something this turn to win
+        
+        civInfo.lastTurnProcessedWithVersion = UncivGame.VERSION
     }
 
     fun updateWinningCiv() {
@@ -348,13 +377,14 @@ class TurnManager(val civInfo: Civilization) {
         // Defeated civs do nothing
         if (civInfo.isDefeated())
             return
-
-        // Do stuff
+        timeThis("automateTurn") {
+            // Do stuff
         NextTurnAutomation.automateCivMoves(civInfo)
 
         // Update barbarian camps
         if (civInfo.isBarbarian && !civInfo.gameInfo.gameParameters.noBarbarians)
             civInfo.gameInfo.barbarians.updateEncampments()
+        }
     }
 
 }

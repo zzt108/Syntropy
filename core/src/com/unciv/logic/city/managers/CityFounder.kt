@@ -86,11 +86,15 @@ class CityFounder {
         triggerCitiesSettledNearOtherCiv(city)
 
         addStartingBuildings(city, civInfo, startingEra)
+        
+        city.resetDisabledConstructions()
+        city.resetSpecialistsControl()
 
-        for (unique in civInfo.getTriggeredUniques(UniqueType.TriggerUponFoundingCity,
-            GameContext(civInfo, city, unit)
-        ))
+        civInfo.forEachTriggeredUnique(UniqueType.TriggerUponFoundingCity,
+            GameContext(civInfo, city, unit), ignoreCities = false
+        ) { unique ->
             UniqueTriggerActivation.triggerUnique(unique, civInfo, city, unit, triggerNotificationText = "due to founding a city")
+        }
         if (unit != null)
             for (unique in unit.getTriggeredUniques(UniqueType.TriggerUponFoundingCity,
                 GameContext(civInfo, city, unit)))
@@ -171,8 +175,9 @@ class CityFounder {
         aliveCivs: Set<Civilization>,
         usedCityNames: Set<String>
     ): String? {
+        val rng = foundingCiv.state.stateBasedRandom("CityFounder.borrowCityName")
         val aliveMajorNations: Sequence<Nation> =
-                aliveCivs.asSequence().filter { civ -> civ.isMajorCiv() }.map { civ -> civ.nation }
+                aliveCivs.asSequence().filter { civ -> civ.isMajorCiv }.map { civ -> civ.nation }
 
         /*
         We take the last unused city name for each other major nation in this game,
@@ -185,7 +190,7 @@ class CityFounder {
                 otherMajorNations.mapNotNull { nation ->
                     nation.cities.lastOrNull { city -> city !in usedCityNames }
                 }.toSet()
-        if (newCityNames.isNotEmpty()) return newCityNames.random()
+        if (newCityNames.isNotEmpty()) return newCityNames.random(rng)
 
         // As per fandom wiki, once the names from the other nations in the game are exhausted,
         // names are taken from the rest of the major nations in the rule set
@@ -197,7 +202,7 @@ class CityFounder {
                 absentMajorNations.flatMap { nation ->
                     nation.cities.asSequence().filter { city -> city !in usedCityNames }
                 }.toSet()
-        if (newCityNames.isNotEmpty()) return newCityNames.random()
+        if (newCityNames.isNotEmpty()) return newCityNames.random(rng)
 
         // If for some reason we have used every single city name in the game,
         // (are we using some sort of rule set mod without city names?)
@@ -237,7 +242,7 @@ class CityFounder {
     private fun triggerCitiesSettledNearOtherCiv(city: City) {
         val citiesWithin6Tiles =
                 city.civ.gameInfo.civilizations.asSequence()
-                    .filter { it.isMajorCiv() && it != city.civ }
+                    .filter { it.isMajorCiv && it != city.civ }
                     .flatMap { it.cities }
                     .filter { it.getCenterTile().aerialDistanceTo(city.getCenterTile()) <= 6 }
         val civsWithCloseCities =
@@ -246,6 +251,6 @@ class CityFounder {
                     .distinct()
                     .filter { it.knows(city.civ) && it.hasExplored(city.getCenterTile()) }
         for (otherCiv in civsWithCloseCities)
-            otherCiv.getDiplomacyManager(city.civ)!!.setFlag(DiplomacyFlags.SettledCitiesNearUs, 30)
+            otherCiv.getDiplomacyManager(city.civ)!!.setFlag(DiplomacyFlags.SettledCitiesNearUs, 30, true)
     }
 }

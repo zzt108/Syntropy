@@ -165,8 +165,20 @@ object DeclareWar {
         }
         diplomacyManager.diplomaticStatus = DiplomaticStatus.War
         
+        val theirDiplomacy = diplomacyManager.otherCiv.getDiplomacyManager(diplomacyManager.civInfo)!!
+        // if we broke our promise to not attack them
+        if (isOffensiveWar
+            && theirDiplomacy.hasFlag(DiplomacyFlags.AgreedToNotAttackUs)
+            && warType in listOf(WarType.DirectWar, WarType.JoinWar)) {
+            theirDiplomacy.setFlag(
+                DiplomacyFlags.MilitaryPresenceNearBorderOrAttackedUsDespitePromise,
+                30,
+                true
+            )
+        }
+        
         // Defensive pact chains are not allowed now
-        if (diplomacyManager.civInfo.isMajorCiv()) {
+        if (diplomacyManager.civInfo.isMajorCiv) {
             if (!isOffensiveWar && warType != WarType.DefensivePactWar && !civAtWarWith.isCityState)
                 callInDefensivePactAllies(diplomacyManager)                
             callInCityStateAllies(diplomacyManager)
@@ -192,7 +204,7 @@ object DeclareWar {
         val otherCivDiplomacy = diplomacyManager.otherCivDiplomacy()
         val warType = declareWarReason.warType
 
-        otherCivDiplomacy.setModifier(DiplomaticModifiers.DeclaredWarOnUs, -20f)
+        otherCivDiplomacy.addDiminishingModifier(DiplomaticModifiers.DeclaredWarOnUs, -20f)
         otherCivDiplomacy.removeModifier(DiplomaticModifiers.ReturnedCapturedUnits)
 
         // Apply warmongering

@@ -1,5 +1,6 @@
 package com.unciv.models.ruleset.tile
 
+import com.unciv.Constants
 import com.unciv.logic.MultiFilter
 import com.unciv.logic.civilization.Civilization
 import com.unciv.logic.map.tile.Tile
@@ -108,33 +109,38 @@ class TileResource : RulesetStatsObject(), GameResource {
         return getImprovements().contains(improvementName)
     }
 
+    @Readonly
+    fun isImprovedBy(improvement: TileImprovement): Boolean {
+        return getImprovements().contains(improvement.name)
+    }
+
     /** @return Of all the potential improvements in [getImprovements], the first this civ can actually build, if any. */
     @Readonly
-    fun getImprovingImprovement(tile: Tile, gameContext: GameContext): String? {
-        if (gameContext.civInfo != null) {
-            val civ: Civilization = gameContext.civInfo
-            return getImprovements().firstOrNull {
-                tile.improvementFunctions.canBuildImprovement(civ.gameInfo.ruleset.tileImprovements[it]!!, gameContext)
-            }
-        }
-        return null
+    fun getImprovingImprovement(tile: Tile, gameContext: GameContext): TileImprovement? {
+        if (gameContext.civInfo == null) return null
+        val civ: Civilization = gameContext.civInfo
+        return getImprovements().asSequence()
+            .map { civ.gameInfo.ruleset.tileImprovements[it]!! }
+            .firstOrNull { tile.improvementFunctions.canBuildImprovement(it, gameContext) }
     }
 
     @Readonly
     fun matchesFilter(filter: String, state: GameContext? = null): Boolean =
         MultiFilter.multiFilter(filter, {
-            matchesSingleFilter(filter) ||
-                state != null && hasTagUnique(filter, state) ||
-                state == null && hasTagUnique(filter)
+            matchesSingleFilter(it) ||
+                state != null && hasTagUnique(it, state) ||
+                state == null && hasTagUnique(it)
         })
 
     @Readonly
     fun matchesSingleFilter(filter: String) = when (filter) {
-        name -> true
         "any" -> true
-        "all" -> true
-        resourceType.name -> true
-        else -> improvementStats?.any { filter == it.key.name } == true
+        in Constants.all -> true
+        else -> when (filter) {
+            name -> true
+            resourceType.name -> true
+            else -> improvementStats?.any { filter == it.key.name } == true
+        }
     }
 
     @Readonly
@@ -149,10 +155,7 @@ class TileResource : RulesetStatsObject(), GameResource {
         val largerLandmassUniques = getMatchingUniques(UniqueType.NaturalWonderLargerLandmass, gameContext).toList()
 
         if (smallerLandmassUniques.any() || largerLandmassUniques.any()) {
-            val sortedContinents = tile.tileMap.continentSizes.asSequence()
-                .sortedByDescending { it.value }
-                .map { it.key }
-                .toList()
+            val sortedContinents = tile.tileMap.continentsSortedBySize
 
             for (unique in smallerLandmassUniques) {
                 if (tile.getContinent() in sortedContinents.take(unique.params[0].toInt())) return false
