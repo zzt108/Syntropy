@@ -56,3 +56,43 @@ Branch: `feature/upstream-hook-minimization`, fast-forwarded to `zzt_develop` @ 
 - [x] **T10 — Remove the bytecode guard.**
   Delete `tests/src/com/unciv/testing/logic/civilization/aiexport/AiExportWiringTest.kt`.
   **Verification:** `./gradlew tests:test` green (total = previous 1044 − 3 removed + 3 new); `git grep -n AiExportWiringTest -- core tests` finds nothing; `git grep -n -E "SYNTROPY-HOOK\s*$" -- core` lists exactly the 4 registered lines.
+
+## Follow-up: review findings (review.md §4)
+
+Branch: `feature/upstream-hook-minimization` @ `517f5649a` (= `zzt_develop`). Accepted: merge checklist (F2, F3), F4 guard, F8 conventions. Not taken: F5 (sound), F3 Gradle input, F6.
+
+- [ ] **T11 — Commit the review.**
+  Commit `review.md` together with this todo update.
+  **Verification:** `git status` clean; `git log -1 --stat` shows `review.md` and `todo.md` only.
+
+- [ ] **T12 — F4: guard the AI export against a civ mismatch.**
+  In `AiExportUIInjector.createAiExportHeader`, remove `@Suppress("UNUSED_PARAMETER")`; on click, compare `viewingPlayer.civName` with `GUI.getSelectedPlayer().civName`. On mismatch, export nothing, log with `Gdx.app.error`, and show a `ToastPopup` ("Status export unavailable for this civilization"). Otherwise unchanged. Extract the comparison into a small pure function (e.g. `internal fun exportCivMatches(viewedCivName: String, selectedCivName: String): Boolean`) so it can be unit-tested without Gdx.
+  **Verification:** a unit test for the pure function (match → true, mismatch → false) in `tests/.../aiexport/`; `./gradlew tests:test --rerun` green; `SyntropyHookInventoryTest` still green (H0 line unchanged); manual: "Copy Status" still copies the own civ's report.
+
+- [ ] **T13 — F2/F3/F8: durable hook conventions and upstream merge checklist.**
+  Create `.doc/upstream-merge.md` (tracked):
+  - the hook conventions 1–6 from `spec.md` §1;
+  - the hook registry pointer (`SyntropyHookInventoryTest`);
+  - the merge checklist:
+    1. fetch upstream;
+    2. sync `origin/master` (GitHub "Sync fork" on `master`, never "Discard commits" on `zzt_develop`);
+    3. dry run = `merge-tree` + build + `tests:test` in a throw-away `git worktree`;
+    4. merge `origin/master` into `zzt_develop`;
+    5. `tests:test --rerun` + `desktop:dist`;
+    6. manual check of the hooked features;
+    7. push.
+
+  Add one sentence with a link to `.doc/upstream-merge.md` to the D-43 row in `.doc/26-11-17 Game design brainstorming/brainstorming-base.md`. Add a short "Upstream hooks" pointer to `CLAUDE.md` (local, untracked: see open decision below).
+  **Verification:** the file renders (no PlantUML needed); the D-43 link resolves; the checklist commands are the ones actually used in T5/T7/T8 (plus the worktree dry run); `git status` shows `upstream-merge.md` and `brainstorming-base.md` only (CLAUDE.md is excluded).
+
+- [ ] **T14 — Land on `zzt_develop` and push.** *(commit/merge/push only on the user's request)*
+  Commit T12–T13, fast-forward `zzt_develop`, push.
+  **Verification:** `zzt_develop` = `origin/zzt_develop`; `./gradlew tests:test --rerun` green on `zzt_develop`.
+
+- [ ] **T15 — Housekeeping.** *(only on the user's request)*
+  Delete the local and remote `feature/upstream-hook-minimization` branch (fully contained in `zzt_develop`) and the local ref `refs/tmp/upstream-master`.
+  **Verification:** `git branch -a` no longer lists the branch; `git merge-base --is-ancestor` was checked before deletion; `git show-ref refs/tmp/upstream-master` finds nothing.
+
+Open decisions (not tasks yet):
+- ~~Should `CLAUDE.md` be tracked? It is currently excluded via `.git/info/exclude`, so its content is not versioned or shared.~~ Resolved 2026-11-18 in another session; T13 adds its pointer to whatever `CLAUDE.md` exists then.
+- ~~Create `.doc/context_state.md`, or drop the reference from `CLAUDE.md`?~~ Decided 2026-11-18: dropped (legacy from the shared `.clinerules` template; diagrams live in feature folders).
