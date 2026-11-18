@@ -1,0 +1,20 @@
+@startuml
+' What: the core formula of SYNTROPY (D-24), as refined by D-48.
+' Shows: the body casts the hexagram lines; the player picks on them; the pick pattern shapes the profile;
+'        profile and random effects add pressure; the soul acts back on the body through climate and era policy.
+' Source: brainstorming-base.md, D-24, D-25, D-48.
+title Core engine (D-24, D-48)
+rectangle "Body\n(Unciv: map, cities, yields)" as BD
+rectangle "I Ching\nreading + rules of change\n(hexagram per realm)" as IC
+rectangle "Profile\n(5 disturbing emotions\n<-> 5 wisdoms)" as PR
+rectangle "Random effects" as RND
+actor "Player" as PL
+BD --> IC : casts the lines
+IC --> PL : line keywords +\nsituation summary
+PL --> IC : most / least picks\n(changing lines)
+PL --> PR : pattern of picks\nshapes the profile
+PR --> IC : pressure toward the\ncurrent pole, number of picks
+IC --> PR : situation feeds\nemotions / wisdoms
+RND --> IC : event pressure,\ndice near the threshold
+IC --> BD : climate + era policy
+@enduml

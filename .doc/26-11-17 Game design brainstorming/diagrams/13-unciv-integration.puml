@@ -1,0 +1,24 @@
+@startuml
+' What: how the Fate engine (own code) touches Unciv (D-41, D-43).
+' Shows: read-only sources, the one write path (temporaryUniques), the known hook (Pride)
+'        and the hooks still to be placed (generation clock, Choice of Fate screen, saving the soul state).
+' Source: brainstorming-base.md, D-43, D-44, D-49, D-50, §4 Engine notes. Open: Q-46 (soul state in the save).
+title Fate engine and Unciv: reads, writes, hooks
+package "Own code (Gdx-independent core)" {
+  component "Fate engine" as FE
+}
+package "Unciv (upstream)" {
+  component "getStatForRanking, statsForNextTurn,\ngetStatMapForNextTurn, hasExplored" as READ
+  component "Civilization.temporaryUniques" as TU
+  component "TechManager.getScienceModifier" as TM
+  component "Turn loop" as TL
+  component "World screen UI" as UI
+  component "Save file" as SV
+}
+FE --> READ : reads, no change
+FE --> TU : injects policy,\nclimate, symptoms
+TM ..> FE : hook: Pride factor
+TL ..> FE : hook: generation clock\n(to be placed)
+UI ..> FE : hook: Choice of Fate screen\n(to be placed)
+FE ..> SV : soul state\n(open: Q-46)
+@enduml

@@ -1,0 +1,26 @@
+@startuml
+' What: body and soul and their four coupling points (D-36), with the later refinements.
+' Shows: the soul (hexagram, profile, Choice of Fate) moves once per generation, the body (Unciv economy) every turn;
+'        (1) climate, (2) era policy, (3) friction from ego symptoms, (4) the body casts the lines.
+' Source: brainstorming-base.md, D-36, D-39, D-44, D-47, D-48, D-50.
+title Body and soul: the four coupling points (D-36)
+package "Soul (every generation)" {
+  rectangle "Hexagram\n(lower + upper trigram)" as HX
+  rectangle "Profile\n(temperament + ego)" as PF
+  rectangle "Choice of Fate\n(most / least picks)" as CF
+}
+package "Body (every turn)" {
+  rectangle "Hex map, cities,\npopulation" as MAP
+  rectangle "Yields:\nMaterial, Wealth (land)\nKnowledge, Culture (people)" as YLD
+  rectangle "Builds + research\n(player's hands)" as ACT
+}
+HX --> YLD : (1) trigram climate:\nyield modifier + connection factor
+CF --> ACT : (2) era policy:\nfitting = slow gain,\ntempting = gain now + ricochet
+PF --> YLD : (3) friction: waste, unrest,\nresearch / trade / shared-work penalty
+MAP --> HX : (4) state casts the lines\n(+ pressure: famine, events, monopoly)
+CF --> PF : pick pattern moves ego
+CF --> HX : changing lines flip
+MAP --> YLD
+YLD --> ACT
+ACT --> MAP
+@enduml

@@ -1,0 +1,15 @@
+@startuml
+' What: how the upper lines (4-6) read "the outside" (D-49 (3), D-45).
+' Shows: a world part (barbarians, explored land, discoveries) and a realms part (contacted realms),
+'        blended by v = n / (n + 1); before any contact only the world counts, and it never disappears.
+' Source: brainstorming-base.md, D-45, D-49, Appendix D.2.
+title Reading the outside (D-49)
+rectangle "World part\n(barbarians, explored land,\nruins, natural wonders)" as W
+rectangle "Realms part\n(contacted realms:\nForce, Score, Tech + Culture shares)" as R
+rectangle "Outside reading\n(1 - v) * world + v * realms\nv = n / (n + 1)" as O
+rectangle "Upper lines\n4 Contact, 5 Power, 6 Ideas" as U
+W --> O : weight 1 - v
+R --> O : weight v
+O --> U
+note bottom of O : n = 0: world only\nn = 1: half and half\nn = 3: 75% realms
+@enduml

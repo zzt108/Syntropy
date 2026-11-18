@@ -1,0 +1,32 @@
+@startuml
+' What: the fate pipeline, run once per generation (D-34, D-35, D-39, D-48).
+' Shows: body reading -> line scores -> primary hexagram -> trembling lines -> most / least picks
+'        -> profile update -> relating hexagram, whose climate and policies push the body until the next reading.
+' Source: brainstorming-base.md, D-34, D-35, D-48, D-49.
+title Fate pipeline, once per generation
+start
+:Read the six axes from the body (b);
+:Add the pressure piled up this generation (p)\n(world events, neighbours, profile);
+:Line score s = w * b + (1 - w) * p\nsign -> yin / yang, |s| over threshold -> old;
+:Primary hexagram = the present;
+:Old lines are the trembling lines\n(dice decide near the threshold, fill up to 2);
+:Show situation summary +\nfitting and tempting keyword per trembling line\n(shuffled, no line numbers);
+:Player places most / least picks\n(count = f(1 - ego));
+repeat :next trembling line;
+  if (most and least on this line?) then (yes)
+    :Line effect cancels;
+    :Dice decide the line;
+  elseif (most?) then (yes)
+    :Line changes;
+  elseif (least?) then (yes)
+    :Line is held;
+  else (unmarked)
+    :Dice decide the line;
+  endif
+repeat while (more trembling lines?) is (yes)
+->no;
+:Profile update: fitting pick -> ego down,\ntempting pick -> ego up (+ temperament hardens);
+:Changing lines flip -> relating hexagram (the direction);
+:Its climate (D-47) and the "most" policies (D-44)\npush the body until the next reading;
+stop
+@enduml

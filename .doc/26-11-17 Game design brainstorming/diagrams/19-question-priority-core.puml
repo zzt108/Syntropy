@@ -1,0 +1,37 @@
+@startuml
+' What: dependencies between the highest-priority open questions (P1 and P2, §5 priority table).
+' Shows: an arrow A -> B means "the answer to A changes B"; a double arrow means the two depend on each other.
+'        The number is the impact score: how many other open questions and decisions the answer would change.
+' Source: brainstorming-base.md §5 "Priority by impact" (edges to lower tiers and to decisions are listed there).
+title Open questions: P1 and P2 dependencies
+left to right direction
+rectangle "P1  Q-19 Audience (8)" as Q19
+rectangle "P1  Q-42 Concept in Unciv terms (7)" as Q42
+rectangle "P1  Q-01 Who is the human (6)" as Q01
+rectangle "P1  Q-33 First ruleset (6)" as Q33
+rectangle "P2  Q-46 Soul state in the save (5)" as Q46
+rectangle "P2  Q-21 Ego illusion: on what scale (5)" as Q21
+rectangle "P2  Q-25 Standstill and collapse (5)" as Q25
+rectangle "P2  Q-22 What RPG means (5)" as Q22
+rectangle "P2  Q-06 Realm interaction (5)" as Q06
+rectangle "P2  Q-45 Standstill trap (4)" as Q45
+rectangle "P2  Q-03 Flow goals (4)" as Q03
+rectangle "P2  Q-07 Fractal hexagrams (4)" as Q07
+rectangle "P2  Q-14 Cooperation (4)" as Q14
+rectangle "P2  Q-27 Profile numbers (4)" as Q27
+Q19 --> Q03
+Q19 --> Q22
+Q42 --> Q33
+Q01 --> Q03
+Q01 --> Q07
+Q01 <--> Q22
+Q21 <--> Q22
+Q07 <--> Q21
+Q07 <--> Q22
+Q21 --> Q14
+Q21 --> Q27
+Q07 --> Q27
+Q06 <--> Q14
+Q45 --> Q25
+Q03 --> Q25
+@enduml

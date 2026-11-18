@@ -1,0 +1,21 @@
+@startuml
+' What: how the "most" picks of a generation become the era policy (D-44).
+' Shows: lookup by family and fit (10 policy sets), fitting scaled by connections, additive stacking,
+'        injection into Unciv's temporaryUniques until the next generation change.
+' Source: brainstorming-base.md, D-44, D-45, D-47, Appendix C, §4 Engine notes. Magnitudes are playtest values.
+title From picks to era policy (D-44)
+start
+:Collect the "most" picks of this generation;
+note right: held, dice-flipped and cancelled lines\nset no policy
+:For each pick: family of the picked keyword\n+ fit (fitting / tempting);
+:Look up the policy set (Appendix C, 10 sets);
+if (fitting?) then (yes)
+  :Scale by connections x connection factor\n(D-45, D-47), with a cap;
+else (tempting)
+  :Flat, immediate bonus, works alone;
+endif
+:Stack all policies additively;
+:Fate engine replaces its entries in temporaryUniques\n(turnsLeft = -1, keyword as source name);
+:Active until the next generation change;
+stop
+@enduml

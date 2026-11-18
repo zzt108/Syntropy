@@ -1,0 +1,16 @@
+@startuml
+' What: the worked example of Appendix A.6 (5): one generation in HG 12 Standstill.
+' Shows: lines 3 and 5 tremble; with most "Own the shame" and least "It's over, relax" the realm heads to HG 33;
+'        had line 5 been left to the dice and flipped, to HG 56. HG 11 Peace is the antipode of HG 12 (all 6 lines differ).
+' Source: brainstorming-base.md, Appendix A.5, A.6, §4 "The I Ching as a state space".
+title Worked example: one generation in HG 12 Standstill
+state "HG 12 Standstill\n(Earth below, Heaven above)" as HG12
+state "HG 33 Retreat\n(Mountain below, Heaven above)" as HG33
+state "HG 56 The Wanderer\n(Mountain below, Fire above)" as HG56
+state "HG 11 Peace\n(Heaven below, Earth above)" as HG11
+[*] --> HG12
+HG12 --> HG33 : most "Own the shame": line 3 changes\nleast "It's over, relax": line 5 held\n(ego down twice)
+HG12 --> HG56 : line 3 changes,\nline 5 unmarked and flipped by the dice
+HG12 -[dashed]-> HG11 : Hamming distance 6\n(antipodes)
+note right of HG12 : lines 3 and 5 tremble
+@enduml

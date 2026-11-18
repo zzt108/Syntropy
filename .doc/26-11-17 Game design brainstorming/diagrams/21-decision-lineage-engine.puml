@@ -1,0 +1,24 @@
+@startuml
+' What: how the early engine and LLM decisions were superseded, deferred or refined.
+' Shows: old decision -> the decision that replaced or changed it. Solid = superseded or deferred, dashed = refined.
+' Source: brainstorming-base.md §3, the ⚠ and "Revised by" notes of D-04, D-05, D-06, D-07, D-13, D-26.
+title Decision lineage: engine and LLM side
+left to right direction
+rectangle "D-04 Unity C#" as D04
+rectangle "D-41 Unciv fork (Kotlin)" as D41
+rectangle "D-05 LLM players via Markdown" as D05
+rectangle "D-06 Manual bridge" as D06
+rectangle "D-07 LLM doc set" as D07
+rectangle "D-26 LLMs embody rivals" as D26
+rectangle "D-28 Rivals are code" as D28
+rectangle "D-29 Advisor kit, one-way paste" as D29
+rectangle "D-13 Auto-Governor" as D13
+rectangle "D-38 Hands-on play" as D38
+D04 --> D41 : superseded
+D05 --> D28 : superseded (rivals)
+D05 --> D29 : superseded (human)
+D06 ..> D29 : refined
+D07 ..> D29 : refined
+D26 --> D28 : superseded (in part)
+D13 --> D38 : deferred
+@enduml

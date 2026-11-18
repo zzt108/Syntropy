@@ -1,0 +1,14 @@
+@startuml
+' What: how concepts (technologies, customs, units) enter the game (D-12, D-30, D-36).
+' Shows: a tagged library generated at development time, priced by the Valuation Engine, unlocked in game by tags.
+'        The open step is what a concept is in Unciv terms (Q-42).
+' Source: brainstorming-base.md, D-12, D-30, D-36, Q-10, Q-42.
+title Concept pipeline (D-12, D-30)
+start
+:Development time: an LLM generates tagged concepts;
+:Valuation Engine prices each concept from its tags;
+note right: open: what is a concept in Unciv terms?\ntech, building, policy, unit? (Q-42)\ntag vocabulary (Q-10)
+:In game: research unlocks concepts by prerequisite tags;
+:Realms pick concepts by tags;
+stop
+@enduml

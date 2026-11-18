@@ -1,0 +1,21 @@
+@startuml
+' What: the trigram climate of a generation (D-47).
+' Shows: the relating hexagram splits into a lower and an upper trigram; the lower gives one inner yield modifier,
+'        the upper gives the connection factor that multiplies the fitting bonus; the player sees only two climate words.
+' Source: brainstorming-base.md, D-47, Appendix B (table of the eight trigrams).
+title Trigram climate (D-47)
+rectangle "Relating hexagram\n(the direction)" as H
+rectangle "Lower trigram\n(lines 1-3)" as L
+rectangle "Upper trigram\n(lines 4-6)" as U
+rectangle "Inner yield modifier\n(one Unciv unique)" as Y
+rectangle "Connection factor\n(x0.5 / x1 / x1.5)" as C
+rectangle "Fitting bonus per connection\n(D-44, D-45)" as F
+rectangle "Shown to the player:\n'Inner: ... / Outer: ...'" as V
+H --> L
+H --> U
+L --> Y
+U --> C
+C --> F
+L --> V
+U --> V
+@enduml

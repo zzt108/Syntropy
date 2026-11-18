@@ -1,0 +1,28 @@
+@startuml
+' What: what a most / least mark does to the line and to the profile (D-32, D-34, D-35, D-44).
+' Shows: the line effect (change, hold, dice) and the profile signal (ego up or down) of each kind of mark,
+'        including the same-line cancel of D-35 ("inner turn").
+' Source: brainstorming-base.md, D-32, D-34, D-35, D-44.
+title Effects of a mark on the line and the profile
+start
+:Player marks a trembling line;
+if (most and least on the same line?) then (yes)
+  :Line: treated as unmarked, the dice decide;
+  if (most = fitting and least = tempting?) then (yes)
+    :Ego down twice ("inner turn");
+  else (no)
+    :Ego up twice;
+  endif
+elseif (most?) then (yes)
+  :Line changes;
+  :Sets an era policy (D-44);
+elseif (least?) then (yes)
+  :Line is held;
+  :No new policy;
+else (unmarked)
+  :The dice decide;
+  :No policy, no profile signal;
+endif
+:Profile signal of single marks:\nmost fitting or least tempting -> ego down\nmost tempting or least fitting -> ego up\ntempting matching own temperament -> temperament hardens;
+stop
+@enduml

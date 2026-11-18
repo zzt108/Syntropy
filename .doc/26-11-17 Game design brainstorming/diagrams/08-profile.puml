@@ -1,0 +1,24 @@
+@startuml
+' What: the structure of a profile (D-31); every realm has one (D-26), the advisor too (D-27).
+' Shows: temperament = a distribution over five families, ego = one scalar;
+'        each family is one energy with a poison side and a wisdom side.
+' Source: brainstorming-base.md, D-31, Appendix A.1 (family verbs).
+title Profile = temperament + ego (D-31)
+class Profile {
+  temperament : share per family
+  ego : one scalar
+}
+class Family {
+  poison
+  wisdom
+}
+Profile "1" o-- "5" Family : temperament share
+note right of Family
+  Confusion <-> Space
+  Anger <-> Mirror
+  Pride <-> Equality
+  Attachment <-> Discernment
+  Jealousy <-> Accomplishing
+end note
+note bottom of Profile : Transformation: ego goes down, temperament stays.\nA proud mind becomes equanimous, not humble.
+@enduml

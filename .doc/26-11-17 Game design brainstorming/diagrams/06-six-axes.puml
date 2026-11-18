@@ -1,0 +1,17 @@
+@startmindmap
+' What: the six axes that cast the hexagram lines (D-49).
+' Shows: lower lines 1-3 read the realm itself, upper lines 4-6 read it against the outside;
+'        each axis has a yang pole / yin pole, and neither pole is good or bad (D-18).
+' Source: brainstorming-base.md, D-49, Appendix D.1 and D.2 (readings and Unciv sources are listed there).
+title The six axes (D-49)
+* Hexagram
+** Upper: the outside
+*** 6 Ideas: radiates / absorbs
+*** 5 Power: dominant / one among equals
+*** 4 Contact: armed beyond its weight / lighter armed
+left side
+** Lower: the realm itself
+*** 3 Expansion: wide / tall
+*** 2 Wealth: flows out / gathers
+*** 1 Material: surplus / sufficiency
+@endmindmap

@@ -1,0 +1,39 @@
+@startuml
+' What: dependencies of the P3 open questions (§5 priority table), with the P4 questions as a note.
+' Shows: an arrow A -> B means "the answer to A changes B". Grey boxes are higher-tier targets (P1, P2)
+'        or Q-20, the sink that collects all others (the smallest playable slice).
+' Source: brainstorming-base.md §5 "Priority by impact".
+title Open questions: P3 dependencies
+left to right direction
+rectangle "P3  Q-40 No others vs. treaties (3)" as Q40
+rectangle "P3  Q-39 Test-off vs. design-out (3)" as Q39
+rectangle "P3  Q-44 Rivals' body (3)" as Q44
+rectangle "P3  Q-32 Turn edge cases (2)" as Q32
+rectangle "P3  Q-10 Tag vocabulary (2)" as Q10
+rectangle "P3  Q-11 Concept decay (2)" as Q11
+rectangle "P3  Q-12 People and generations (2)" as Q12
+rectangle "P3  Q-15 How war feels (2)" as Q15
+rectangle "P3  Q-18 Narrator (2)" as Q18
+rectangle "P3  Q-08 Keyword source (2)" as Q08
+rectangle "Q-14 Cooperation" as T14 #DDDDDD
+rectangle "Q-33 First ruleset" as T33 #DDDDDD
+rectangle "Q-25 Standstill and collapse" as T25 #DDDDDD
+rectangle "Q-07 / Q-22 RPG cluster" as TRPG #DDDDDD
+rectangle "Q-06 Realm interaction" as T06 #DDDDDD
+rectangle "Q-20 Smallest playable slice\n(+ Q-16 rival count, Q-35 culture drain)" as T20 #DDDDDD
+Q40 --> T14
+Q39 --> T33
+Q44 --> T20
+Q32 <--> Q08
+Q10 --> Q11
+Q11 --> T25
+Q11 --> T20
+Q12 --> TRPG
+Q15 --> T06
+Q15 --> T33
+Q18 --> T20
+note as P4
+  P4 (impact 0-1): Q-26, Q-35, Q-41, Q-43,
+  Q-16, Q-30, Q-04, Q-38, Q-20
+end note
+@enduml

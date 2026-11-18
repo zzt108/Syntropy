@@ -1,0 +1,19 @@
+@startuml
+' What: the five ego symptoms on the Unciv body (D-50).
+' Shows: intensity per family = ego x temperament share; each family shows as one phenomenon with its Unciv form.
+'        The player sees the phenomenon name, never the emotion (D-17).
+' Source: brainstorming-base.md, D-40, D-50. Penalty sizes c_f are playtest values.
+title Ego symptoms on the Unciv body (D-50)
+rectangle "Profile\nintensity(f) = ego x temperament(f)" as P
+rectangle "Waste\n- % Production and Food\n(larger cities more)" as W
+rectangle "Unrest\n+ % Unhappiness\n(empire happiness)" as U
+rectangle "We have nothing to learn\nknown-tech discount shrinks\n(hook: getScienceModifier)" as N
+rectangle "Hoarding\n- % Gold from Trade Routes" as H
+rectangle "Rivalry\n- % Science from research agreements,\nconnection bonus shrinks" as R
+P --> W : Confusion
+P --> U : Anger
+P --> N : Pride
+P --> H : Attachment
+P --> R : Jealousy
+note bottom of P : Injected each generation into temporaryUniques,\nphenomenon name as source name.\nPride and Jealousy do nothing to a realm alone.
+@enduml

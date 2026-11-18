@@ -1,0 +1,22 @@
+@startuml
+' What: what the player sees and what stays hidden (D-08, D-17, D-23, D-47, D-50).
+' Shows: every hidden soul value reaches the player only in a translated form:
+'        keywords, climate words, keyword and phenomenon names in the stat breakdown, the Journal.
+' Source: brainstorming-base.md, D-08, D-17, D-23, D-34, D-47, D-48, D-50, §4 Engine notes.
+title Visible and hidden
+package "Hidden" {
+  rectangle "Hexagram, trigrams,\nline numbers" as H1
+  rectangle "Ego, temperament,\nfamily, fit" as H2
+  rectangle "Line scores, pressure" as H3
+}
+package "Visible" {
+  rectangle "Situation summary\n+ keywords (no line numbers)" as V1
+  rectangle "Climate words\n(Inner / Outer)" as V2
+  rectangle "Stat breakdown:\nkeyword and phenomenon names" as V3
+  rectangle "Journal" as V4
+}
+H1 --> V1 : shown as keywords
+H1 --> V2 : shown as words
+H2 --> V3 : shown as phenomena
+H3 --> V4 : intent vs. next reading
+@enduml

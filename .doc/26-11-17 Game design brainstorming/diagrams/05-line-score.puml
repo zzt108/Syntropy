@@ -1,0 +1,25 @@
+@startuml
+' What: how one hexagram line gets its value at the generation change (D-48, D-49).
+' Shows: body reading x -> normalised b -> blended with pressure p into the line score s;
+'        the sign (yin / yang) has a hysteresis band, the old threshold decides whether the line trembles.
+' Source: brainstorming-base.md, D-48, D-49, Appendix D.3. All constants (k, x0, w, h, threshold) are playtest values.
+title Line score of one line (D-48, D-49)
+start
+:Body reading x for this axis;
+:b = tanh(k * (x - x0));
+:Pressure p piled up this generation;
+:s = w * b + (1 - w) * p   (w about 0.7);
+if (s beyond the hysteresis band h,\non the other side of the current sign?) then (yes)
+  :Sign flips (yin <-> yang);
+else (no)
+  :Sign stays;
+endif
+if (|s| close to the old threshold?) then (yes)
+  :Dice decide old or young,\nweighted by distance;
+elseif (|s| above the old threshold?) then (yes)
+  :Old line = trembling line;
+else (below)
+  :Young line = stable;
+endif
+stop
+@enduml

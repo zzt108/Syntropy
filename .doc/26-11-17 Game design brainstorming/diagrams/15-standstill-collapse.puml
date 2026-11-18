@@ -1,0 +1,20 @@
+@startuml
+' What: the one fail-like arc of the game: monopolization, Standstill, collapse (D-19, D-33).
+' Shows: the hegemon falls into Standstill, pressure builds, a break (collapse) follows, the game continues.
+'        Open points are marked: what holds the hegemon in Standstill (Q-45) and what a collapse produces (Q-25).
+' Source: brainstorming-base.md, D-19, D-33, D-48, Q-25, Q-45.
+title Monopolization, Standstill and collapse (D-19)
+state "Many realms\n(balance)" as Open
+state "Monopolization\n(line 5 dominant)" as Mono
+state "Standstill\n(HG 12, rigid lines)" as SS
+state "Collapse\n(many old lines at once)" as COL
+state "Successor state\n(open: Q-25)" as SUC
+[*] --> Open
+Open --> Mono : the weak are swept away
+Mono --> SS : the hegemon turns rigid
+SS --> SS : pressure builds
+SS --> COL : break (P2)
+COL --> SUC
+SUC --> Open : the game continues
+note right of SS : Open: what holds the hegemon here\nif the hexagram is a body reading? (Q-45)
+@enduml
