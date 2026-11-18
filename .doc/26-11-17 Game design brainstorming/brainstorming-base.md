@@ -76,7 +76,8 @@ Philosophy underneath: *everything is one mind's appearance, so everything is go
 | D-45 | **"There are no others"** (Nishargadatta). The game has **no partner category**: no ally list, no friend/foe status the fitting bonus depends on. Reading (confirmed by the user): every realm the player is **in contact with** (has met) counts as a connection, **whatever the diplomatic state, war included**. | 2026-11-17. Answers "who counts as a partner" from D-44 (5). Splitting the world into own and other is itself an ego symptom (Pride's "Keep to our own", Appendix A.4), so the game must not build that split into its rules. Open detail: whether the bonus counts realms only, or also the *intensity* of the contact (trade, borders, diffusion); links Q-14, Q-21. |
 | D-46 | **Ars poetica: a model of reality, not a religion.** The game is not Buddhist or Taoist. Those traditions are used because they approximate reality better than Civ's principles; Civ's principles are not wrong, only narrower, and they stay. Text: §1. | 2026-11-17. User's words, wording approximate ("kb az ars poetica"). Fits D-03, D-08, D-17: no doctrine, no tradition's terms in the game. **Consequences (agreed 2026-11-17):** (a) Civ's logic is the **tempting column** (D-32, D-44): it really pays, now; the game only shows its ricochet. Civ is not the opponent, it is one half of reality. (b) A second design test beside flow: when two rules are possible, prefer the one closer to how people actually behave. Recorded as meta-pillar **P6** (§2). **Why the I Ching** (user, 2026-11-17): it looks like a horoscope, but its map of possible changes between states is remarkably well-founded (§4 "The I Ching as a state space"). It is used for its **formalism** (the transition map), not for divination; the meaning (keywords, situation summary) is our own (Q-08). Parallel: quantum mechanics has one well-tested formalism and many interpretations that experiments cannot (yet) tell apart. **The game is an experiment:** D-20 gives repeatability, playtests are the experiment, tuning the working values is the evaluation; so P6 is a testable claim inside the model, not a belief. |
 | D-47 | **Trigram climate: lower = one yield modifier, upper = connection factor.** (1) The **lower** trigram gives one yield or growth modifier, each an existing Unciv unique. (2) The **upper** trigram gives a **connection factor** that multiplies the D-44 fitting bonus per connection (D-45): the outer side is *how much contact pays*. (3) Neighbour-facing effects of the old draft (friction, envy, monopoly pressure, trade risk) are **not** yields; they move to Q-06 / Q-26 as line pressure (D-25). (4) Visibility: two plain words, inner and outer (e.g. "Inner: creative · Outer: receptive"), plus the effects in the stat breakdown as in D-44; no trigram names or symbols (D-08). The line → trigram link stays hidden, because keywords carry no line numbers (D-34), so picks cannot be optimised for yields (protects D-32). (5) The climate **stacks** with the era policy (D-44); a climate that amplifies a temptation is intended (P6: circumstances tempt; A.6 obs. 3). | 2026-11-17. Resolves Q-36. Table: Appendix B. All magnitudes and factors are **playtest values, not decided**; the factors are uneven on purpose (four ×1.5, three ×1, one ×0.5). |
-| D-48 | **The body casts the lines.** No divination happens in the game, so the current hexagram must **correspond to the game state**, line by line. Key mechanism. (1) **Six lines = six axes read from the body**, each between two legitimate poles (D-18); lower lines 1–3 = the inner state, upper lines 4–6 = the relation to others (consistent with D-47). (2) **Line score** per line at the generation change: **s = w · b + (1 − w) · p**, w ≈ 0.7. *b* = body reading ∈ [−1, +1] (−1 full yin pole, +1 full yang pole), the main weight. *p* = pressure ∈ [−1, +1], piled up during the generation's turns (D-39) from world events (D-25), neighbours (Q-06) and the profile (ego pushes a line toward its current pole), reset at the generation change. (3) **Sign of s → yin / yang; \|s\| above a threshold → old line** (the traditional 6 / 9), otherwise young (7 / 8); near the threshold the dice decide, weighted by distance (D-21). (4) **Old lines are the trembling lines.** If there are fewer than the minimum (2, D-34), the dice add the lines closest to the threshold. (5) Pipeline: reading → **primary hexagram** (the present) → picks on the old lines (D-32 … D-35 unchanged) → **relating hexagram** (the direction) → its climate (D-47) and the "most" policies (D-44) push the body until the next reading. | 2026-11-17. The user: both "the body gives the lines" and "the body pushes the line odds" are wanted, with more weight on the first; the blend does both. With w = 0.7 pressure can flip a line's sign only where \|b\| < 0.3 / 0.7 ≈ 0.43: a clear body is read as it is, an ambiguous one is decided by events (P6). Pressure can also push a young line into old, i.e. make it tremble: the old "odds" role survives. Ego rigidity (D-33) needs no own rule: clinging pushes a line to its own extreme until it turns old and flips (P2). The gap between the intended direction (relating) and the next reading (the next primary) goes to the Journal. Refines D-21, D-24, D-34, D-36 (4). Axes: Appendix D (draft). w and the thresholds are playtest values. |
+| D-48 | **The body casts the lines.** No divination happens in the game, so the current hexagram must **correspond to the game state**, line by line. Key mechanism. (1) **Six lines = six axes read from the body**, each between two legitimate poles (D-18); lower lines 1–3 = the inner state, upper lines 4–6 = the relation to others (consistent with D-47). (2) **Line score** per line at the generation change: **s = w · b + (1 − w) · p**, w ≈ 0.7. *b* = body reading ∈ [−1, +1] (−1 full yin pole, +1 full yang pole), the main weight. *p* = pressure ∈ [−1, +1], piled up during the generation's turns (D-39) from world events (D-25), neighbours (Q-06) and the profile (ego pushes a line toward its current pole), reset at the generation change. (3) **Sign of s → yin / yang; \|s\| above a threshold → old line** (the traditional 6 / 9), otherwise young (7 / 8); near the threshold the dice decide, weighted by distance (D-21). (4) **Old lines are the trembling lines.** If there are fewer than the minimum (2, D-34), the dice add the lines closest to the threshold. (5) Pipeline: reading → **primary hexagram** (the present) → picks on the old lines (D-32 … D-35 unchanged) → **relating hexagram** (the direction) → its climate (D-47) and the "most" policies (D-44) push the body until the next reading. | 2026-11-17. The user: both "the body gives the lines" and "the body pushes the line odds" are wanted, with more weight on the first; the blend does both. With w = 0.7 pressure can flip a line's sign only where \|b\| < 0.3 / 0.7 ≈ 0.43: a clear body is read as it is, an ambiguous one is decided by events (P6). Pressure can also push a young line into old, i.e. make it tremble: the old "odds" role survives. Ego rigidity (D-33) needs no own rule: clinging pushes a line to its own extreme until it turns old and flips (P2). The gap between the intended direction (relating) and the next reading (the next primary) goes to the Journal. Refines D-21, D-24, D-34, D-36 (4). Axes: D-49, Appendix D. w and the thresholds are playtest values. |
+| D-49 | **The six axes and how they are read.** (1) **Rates and ratios, not size**, so the six readings stay as independent as possible and all 64 hexagrams stay reachable; size is measured on line 5 only, because monopoly (D-19) *is* size. (2) **Lower lines (the realm itself):** line 1 Material = trend of (food surplus + production) against the realm's own previous generation; line 2 Wealth = spent share of gross income, spent = gross income − Δtreasury (upkeep, purchases, gold given in trades and gifts, all in one term); line 3 Expansion = **wide vs. tall**, the production-weighted share of wide things (new cities, tiles, tile improvements, settlers, workers) against tall things (buildings, wonders). (3) **Upper lines (the outside)** read against a blend: **outside = (1 − v) · world + v · realms, v = n / (n + 1)**, n = number of contacted realms. The world part (barbarians, explored land, discoveries) keeps the upper lines meaningful before any contact and never disappears afterwards (D-45). (4) Normalisation per axis: **b = tanh(k · (x − x₀))**, with its own k and neutral point x₀. (5) **Hysteresis on the sign** (a yang line stays yang until s < −h); the dice act only at the old threshold (D-48). (6) **The profile does not shift the thresholds**: ego already acts through the pressure p; one effect, one mechanism (D-25). (7) All readings come from snapshots at the start and end of a generation, read-only, with no upstream change (D-43). | 2026-11-17. Resolves most of Q-38. The user's refinements: production belongs in Material; upkeep counts as spending; territory alone is too slow and too jumpy for a ~5-turn generation, so built things count (became wide vs. tall); before contact the outside is the world (scouts, settlers, barbarians, city-states). Military units are left out of line 3 because they feed line 4. All k, x₀, h and thresholds are playtest values. Full table, edge cases, feedback check and the coverage test: Appendix D. |
 
 ## 4. Core model (as understood so far)
 
@@ -208,7 +209,7 @@ Grouped by the session that should resolve them (§7). **Bold** = blocks other d
 - ~~Q-29 Do LLM realms have a profile too?~~ Resolved by D-26.
 - **Q-30 Advisor & LLM profiles (D-26):** (a) If the human follows the advisor's suggestion, whose profile moves? Working view: following advice is itself a choice, so the human's. ~~(b) Does the advisor have a profile of its own?~~ Yes, D-27. Still open: can the player pick/switch advisors, and does the advisor's profile drift too? ~~(c) persona drift~~ and ~~(d) bridge load~~: largely solved by D-28 (rivals are code, profile is an input) and D-29 (one optional, one-way paste per generation). Remaining: since the game never sees the advice (D-29), the advisor's profile cannot drift in-game; acceptable?
 - ~~Q-31 Who invents new concepts now?~~ Resolved by D-30: (a) library now, (c) maybe later. Original text kept for context: D-12's Valuation Engine assumed rivals invent concepts live. With coded rivals (D-28), options: (a) a concept library pre-generated by an LLM at development time, rivals pick from it by tags; (b) the human imports a concept proposed by their advisor (a small, validated `NEW_CONCEPT` paste back into the game); (c) both. Without some channel the "infinite evolution" idea shrinks to a finite library.
-- **Q-38 The six axes of D-48:** which six body axes cast the lines, how each is read in Unciv, hysteresis around the threshold, whether the profile shifts the thresholds, and how strong the climate → own line feedback is. Draft and details: Appendix D.
+- Q-38 The six axes of D-48. *Mostly resolved by D-49 (axes, readings, world/realm blend, hysteresis, no profile shift of thresholds). Still open: the constants k, x₀, h and the old threshold per axis (playtests), and the result of the coverage test (Appendix D.6).*
 - Q-06 How do realms' hexagrams **interact**? (Trade/war/contact pushing lines in the neighbour's hexagram.) *Candidates moved here by D-47 from the old trigram draft: Heaven above = monopoly pressure on neighbours; Thunder above = sudden contact, border friction; Fire above = neighbours copy and envy.*
 - Q-07 "Fractal": is there also a hexagram per **city / group / person**, not only per realm? *Since D-48 a city hexagram is cheap: read the same six axes for one city.*
 - Q-08 Keyword source: own phrasing derived from public-domain translations (e.g. Legge, 1882)? Some later translations are still under copyright.
@@ -282,6 +283,8 @@ Cheap trick worth trying early (still no code): **play a paper prototype in chat
 - *HallucInc notes* (deleted 2026-11-17): a Reddit post (r/ClaudeAI, "I built a free browser game with Claude Code") on a CLAUDE.md and sub-agent setup for an AI-built game. **Where it overlaps with `CLAUDE.md`, `CLAUDE.md` wins** (start-of-session reading = "re-read `.doc/` at every phase"; gated milestones = the 4-phase workflow with a stop after each phase; commit cadence = "commit only when the user asks", not "after each change"). Only one non-overlapping idea is kept for implementation: "same seed + same choices = same run" as a never-break rule (cf. D-10, Q-17). Its sub-agent workflow is **rejected**: no sub-agents in this project.
 
 ## 9. Decision log (append-only, newest on top)
+
+- **2026-11-17**: The six axes agreed (D-49, Q-38 mostly resolved): rates and ratios instead of size; Material = trend of food surplus + production; Wealth = spent share of gross income (upkeep included); Expansion = wide vs. tall; upper lines read against the outside = world + realms, blended by v = n / (n + 1), so they mean something before any contact. Hysteresis on the sign, no profile shift of thresholds. Appendix D rewritten (readings, edge cases, climate feedback check, coverage test).
 
 - **2026-11-17**: Key mechanism agreed: the body casts the lines (D-48). Line score s = w · b + (1 − w) · p (body reading as main weight, pressure from events, neighbours and profile as the second); old lines = trembling lines; primary hexagram = the present, relating hexagram = the direction. D-21, D-24, D-34, D-36 (4) marked as refined; fate pipeline and body/soul diagrams updated; Q-26 largely resolved; new Q-38 (the six axes); six-axis draft in Appendix D.
 
@@ -418,30 +421,66 @@ Draft for D-44. The effects are directions, not numbers; magnitudes are playtest
 
 Open: Accomplishing-fitting has nothing to act on until "shared work" exists in the body (Q-37). Until then a fallback is needed, e.g. + Production per connection.
 
-## Appendix D. The six axes, draft (2026-11-17)
+## Appendix D. The six axes (D-49, 2026-11-17)
 
-Draft for D-48, **not agreed**: the choice of the six axes is the most important open point of D-48 (Q-38). Line positions keep their traditional meaning (bottom = foundation, 2 and 5 = the inner and outer centre, 3 = the threshold, 6 = beyond). Lower lines read the realm itself; upper lines read it **relative to the contacted realms** (D-45). Neither pole is good or bad (D-18).
+Agreed in D-49; all constants are playtest values. Line positions keep their traditional meaning (bottom = foundation, 2 and 5 = the inner and outer centre, 3 = the threshold, 6 = beyond). Lower lines read the realm itself; upper lines read it against **the outside** (D-45). Neither pole is good or bad (D-18).
 
-| Line | Position | Axis | Yang pole | Yin pole | Unciv reading (sketch) |
+### D.1 Lower lines: the realm itself
+
+| Line | Position | Axis | Yang pole | Yin pole | Reading x (per generation) |
 |---|---|---|---|---|---|
-| 1 | foundation, the land | Material | surplus | balance / scarcity | food + production surplus per city |
-| 2 | inner centre | Wealth | spends, invests | saves, stores | trend of the treasury |
-| 3 | threshold (inside → outside) | Expansion | expands | consolidates | new cities and tiles this generation |
-| 4 | meeting the neighbour | Contact | pushes outward | receives (trade, open borders) | military strength vs. number of connections |
-| 5 | the ruler | Power | dominant | one among equals | score share among the contacted realms |
-| 6 | beyond, the end | Ideas | radiates (ahead of the others) | absorbs (behind, learns) | Science + Culture vs. the contacted average |
+| 1 | foundation, the land | Material | surplus (the base grows) | sufficiency (lives within its means) | M = food surplus + production, averaged over the turns, ÷ M of the previous generation |
+| 2 | inner centre | Wealth | flows out (spends, invests) | gathers (saves) | (G − Δtreasury) ÷ G, G = gross gold income (positive entries of `getStatMapForNextTurn()`) |
+| 3 | threshold (inside → outside) | Expansion | wide | tall | W ÷ (W + T), production-cost weighted: W = new cities, tiles, tile improvements, settlers, workers; T = new buildings, wonders |
 
-Reading check: **HG 11 Peace** (1–3 yang, 4–6 yin) = plenty, spending and growth at home; receptive, equal and learning outward. **HG 12 Standstill** (1–3 yin, 4–6 yang) = storing and scarcity at home; pushing, dominant and not learning outward: the hegemon of D-19, and line 5 is the monopoly measure itself. **HG 1** (all yang) = overreach everywhere; line 6 "regret" sits where it should.
+### D.2 Upper lines: the outside
 
-What D-48 gives for free:
+outside = (1 − v) · world + v · realms, v = n / (n + 1), n = number of contacted realms.
+
+| Line | Position | Axis | Yang pole | Yin pole | Realms part | World part |
+|---|---|---|---|---|---|---|
+| 4 | meeting the neighbour | Contact | armed beyond its weight | lighter armed than its weight | Force share ÷ Score share among the contacted | own Force vs. the nearby barbarian force (seen units, encampments) |
+| 5 | the ruler | Power | dominant | one among equals | Score share vs. the equal share 1 / (n + 1) | own territory ÷ explored land |
+| 6 | beyond, the end | Ideas | radiates (ahead of its weight) | absorbs (behind, learns) | (Technologies + Culture) share ÷ Score share | own Science + Culture ÷ discovery (new tiles, ruins, natural wonders) |
+
+Line 4 is the army example of D-18: the yang pole can be deterrence (Mirror: a boundary) or conquest (Anger); the keywords decide which, not the measurement. Line 5, world part: the more a scout discovers, the smaller the realm reads; settlers push it toward dominant.
+
+### D.3 Reading and normalisation
+
+- b = tanh(k · (x − x₀)), with its own k and neutral point x₀ per axis (e.g. line 2: x₀ ≈ 0.75 of income spent).
+- Sources, all read-only: `Civilization.getStatForRanking(RankingType)` (Score, Force, Territory, Technologies, Culture…), `stats.statsForNextTurn`, `CivInfoStatsForNextTurn.getStatMapForNextTurn()`, `Civilization.hasExplored(tile)`, `GameInfo.getBarbarianCivilization()`. The Fate engine stores the generation-start snapshot in its own state.
+- Sign: hysteresis band h (≈ 0.1). Old threshold: the dice decide near it, weighted by distance (D-48).
+
+### D.4 Edge cases
+
+- **First generation:** line 1 compares against the start-of-game snapshot.
+- **Line 2:** spent above 100% (living on reserves) = strongly yang; large trade income can make spent negative = yin, read correctly as gathering.
+- **Line 3, conquest:** a captured city counts in W as one settler. Its buildings and improvements count neither in W nor in T: only cities and tiles owned at both snapshots count. Military units are left out (they feed line 4).
+- **Nothing built** (W + T = 0) or **barbarians switched off** (line 4 world part): b = 0; pressure decides and hysteresis keeps the sign.
+- **City-states** (if the ruleset keeps them, D-42): no own rule, they count as contacted realms in n.
+
+### D.5 Climate feedback check (D-47 lower climate on the lower lines)
+
+| Lower trigram (lines 1-2-3) | Climate effect | Pushes | Direction |
+|---|---|---|---|
+| Earth (yin-yin-yin) | + growth | line 1 → yang | corrective |
+| Thunder (yang-yin-yin) | + settlers | line 3 → yang | corrective |
+| Water (yin-yang-yin) | + Gold | line 2 → yin (gathers) | corrective |
+| Wind (yin-yang-yang) | − improvement time | line 1 → yang | corrective |
+| Mountain (yin-yin-yang) | − growth | line 1 → yin | **reinforcing** |
+| Lake (yang-yang-yin) | − unhappiness | line 1 → yang | weakly reinforcing |
+| Heaven, Fire | Science, Culture | line 6 (upper) | none on the lower lines |
+
+The climate mostly pushes the body toward its own opposite, so the hexagram keeps moving (the Book of Changes does exactly this). Mountain ("keeping still") holds itself, which fits its meaning; old → flip breaks it in the end (P2).
+
+### D.6 Coverage test (candidate for a future Verification Strategy)
+
+Over many simulated games with fixed seeds (D-20): every one of the 64 hexagrams appears, none dominates, and the correlation matrix of the six b values stays low. This is the experiment side of P6: the model claims six independent axes, and the claim is measurable.
+
+Reading check: **HG 11 Peace** (1–3 yang, 4–6 yin) = the base grows, wealth flows, the realm goes wide at home; outward lightly armed, one among equals, learning. **HG 12 Standstill** (1–3 yin, 4–6 yang) = sufficiency, gathering, building tall at home; outward armed beyond its weight, dominant, radiating without learning: the hegemon of D-19, and line 5 is the monopoly measure itself. **HG 1** (all yang) = overreach everywhere; line 6 "regret" sits where it should.
+
+### D.7 What D-48 gives for free
 
 - **Collapse** = many axes at an extreme at once → many old lines (Q-32 b, D-33).
 - **Standstill** = lines held young and rigid: little to choose (Q-25).
 - **Fractal** (Q-07): the same six axes can be read for a city.
-
-Open (Q-38):
-
-- (a) **Hysteresis:** a line must not flicker around the threshold (Schmitt-trigger-like bands).
-- (b) **Profile and thresholds:** may the profile shift the old threshold (high ego → lines turn old sooner, the D-33 break)?
-- (c) **Feedback loops:** the lower climate strengthens its own line (e.g. Earth: + growth → line 1). Old → flip limits it; to be checked in playtests.
-- (d) **The axes themselves:** are these the right six, and are they measurable in Unciv without own code?
