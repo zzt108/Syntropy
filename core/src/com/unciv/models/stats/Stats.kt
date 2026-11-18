@@ -9,9 +9,9 @@ import yairm210.purity.annotations.*
  *
  * Supports e.g. `for ((key,value) in <Stats>)` - the [iterator] will skip zero values automatically.
  *
- * Also possible: `<Stats>`.[values].sum() and similar aggregates over a Sequence<Float>.
+ * Use [sum], [min], [max] for fast aggregates.
  */
-@InternalState
+@ModifiesInternalStateOnly
 open class Stats(
     var production: Float = 0f,
     var food: Float = 0f,
@@ -65,7 +65,7 @@ open class Stats(
 
     /** **Non-Mutating function**
      * @return a new instance containing the same values as `this` */
-    @Readonly fun clone() = Stats(production, food, gold, science, culture, happiness, faith)
+    @Readonly @ReturnsNewInstance fun clone() = Stats(production, food, gold, science, culture, happiness, faith)
 
     /** @return `true` if all values are zero */
     @Readonly
@@ -105,11 +105,19 @@ open class Stats(
 
     /** **Non-mutating function**
      * @return a new [Stats] instance */
-    operator fun plus(stats: Stats) = clone().apply { add(stats) }
+    operator fun plus(stats: Stats): Stats {
+        val clone = clone()
+        clone.add(stats)
+        return clone
+    }
 
     /** **Non-mutating function**
      * @return a new [Stats] instance */
-    operator fun minus(stats: Stats) = clone().apply { add(stats.times(-1)) }
+    operator fun minus(stats: Stats): Stats {
+        val clone = clone()
+        clone.add(stats.times(-1))
+        return clone
+    }
 
     /** **Mutating function**
      * Adds the [value] parameter to the instance value specified by [stat] in place
@@ -164,45 +172,39 @@ open class Stats(
         faith *= 7
     }
 
+    /** Common stringification logic shared by [toString], [toStringForNotifications],
+     * [toStringWithoutIcons] and [toStringOnlyIcons] - see those for semantics of the parameters. */
+    @Readonly
+    private fun stringify(showSign: Boolean = true, showName: Boolean = true, showIcon: Boolean = true, translate: Boolean = true): String {
+        return this.joinToString {
+            val sign = if (showSign && it.value > 0) "+" else ""
+            val amount = if (translate) it.value.toInt().tr() else it.value.toInt().toString()
+            val label = when {
+                !showName -> it.key.character.toString()
+                translate -> it.key.name.tr(hideStats = !showIcon)
+                else -> (if (showIcon) it.key.character.toString() else "") + it.key.name
+            }
+            "$sign$amount $label"
+        }
+    }
+
     /** ***Not*** only a debug helper. It returns a string representing the content, already _translated_.
      *
      * Example output: `+1 Production, -1 Food`.
      */
     @Readonly
-    override fun toString(): String {
-        return this.joinToString {
-            (if (it.value > 0) "+" else "") + it.value.toInt().tr() + " " + it.key.toString().tr()
-        }
-    }
+    override fun toString() = stringify()
 
     /** Since notifications are translated on the fly, when saving stats there we need to do so in English */
-    fun toStringForNotifications() = this.joinToString {
-        (if (it.value > 0) "+" else "") + it.value.toInt() + " " + it.key.toString()
-    }
+    fun toStringForNotifications() = stringify(showIcon = false, translate = false)
 
-    // For display in diplomacy window
-    fun toStringWithDecimals(): String {
-        return this.joinToString {
-            (if (it.value > 0) "+" else "") + it.value.tr().removeSuffix(".0") + " " + it.key.toString().tr()
-        }
-    }
-
-    // function that removes the icon from the Stats object since the circular icons all appear the same
-    // delete this and replace above instances with toString() once the text-coloring-affecting-font-icons bug is fixed (e.g., in notification text)
+    /** Same as [toString], but without the leading [Stat] icon character and without the sign. */
     @Readonly
-    fun toStringWithoutIcons(): String {
-        return this.joinToString {
-            it.value.toInt().tr() + " " + it.key.name.tr().substring(startIndex = 1)
-        }
-    }
+    fun toStringWithoutIcons() = stringify(showIcon = false)
 
     /** Return a string of just +/- value and Stat symbol*/
     @Readonly
-    fun toStringOnlyIcons(addPlusSign: Boolean = true): String {
-        return this.joinToString {
-            (if (addPlusSign && it.value > 0) "+" else "") + it.value.toInt() + " " + it.key.character
-        }
-    }
+    fun toStringOnlyIcons(addPlusSign: Boolean = true) = stringify(showSign = addPlusSign, showName = false, translate = false)
 
     /** Represents one [key][Stat]/[value][Float] pair returned by the [iterator] */
     data class StatValuePair (val key: Stat, val value: Float)
@@ -221,19 +223,19 @@ open class Stats(
         if (faith != 0f) yield(StatValuePair(Stat.Faith, faith))
     }
 
-    /** Enables aggregates over the values, never empty */
-    // Property syntax to emulate Map.values pattern
-    // Doesn't skip zero values as it's meant for sum() or max() where the overhead would be higher than any gain
-    val values
-        get() = sequence {
-            yield(production)
-            yield(food)
-            yield(gold)
-            yield(science)
-            yield(culture)
-            yield(happiness)
-            yield(faith)
-        }
+    @Readonly
+    /** Fast aggregate: Sum over all seven stats */
+    fun sum() = production + food + gold + science + culture + happiness + faith
+    @Readonly
+    /** Fast aggregate: Min of all seven stats */
+    fun min() = production.coerceAtMost(food).coerceAtMost(gold)
+        .coerceAtMost(science).coerceAtMost(culture)
+        .coerceAtMost(happiness).coerceAtMost(faith)
+    @Readonly
+    /** Fast aggregate: Max of all seven stats */
+    fun max() = production.coerceAtLeast(food).coerceAtLeast(gold)
+        .coerceAtLeast(science).coerceAtLeast(culture)
+        .coerceAtLeast(happiness).coerceAtLeast(faith)
 
     /** Returns an iterator over the elements of this object, wrapped as [StatValuePair]s */
     override fun iterator(): Iterator<StatValuePair> = asSequence().iterator()
@@ -285,11 +287,14 @@ open class Stats(
     }
 }
 
-@InternalState
+@ModifiesInternalStateOnly
 class StatMap : LinkedHashMap<String,Stats>() {
     fun add(source: String, stats: Stats) {
         // We always clone to avoid touching the mutable stats of uniques
         if (!containsKey(source)) put(source, stats.clone())
-        else get(source)!!.add(stats)
+        else {
+            @LocalState val existingStats = get(source)!! 
+            existingStats.add(stats)
+        }
     }
 }

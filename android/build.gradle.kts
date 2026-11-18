@@ -6,20 +6,19 @@ import java.util.Properties
 
 plugins {
     id("com.android.application")
-    id("kotlin-android")
 }
 
 android {
-    compileSdk = 36
+    compileSdk = 37
     sourceSets {
         getByName("main").apply {
             manifest.srcFile("AndroidManifest.xml")
-            java.srcDirs("src")
-            aidl.srcDirs("src")
-            renderscript.srcDirs("src")
-            res.srcDirs("res")
-            assets.srcDirs("assets")
-            jniLibs.srcDirs("libs")
+            java.directories += "src"
+            kotlin.directories += "src"
+            aidl.directories += "src"
+            res.directories += "res"
+            assets.directories += "assets"
+            jniLibs.directories += "libs"
         }
     }
     packaging {
@@ -31,18 +30,11 @@ android {
         namespace = BuildConfig.identifier
         applicationId = BuildConfig.identifier
         minSdk = 21
-        targetSdk = 35
+        targetSdk = 36
         versionCode = BuildConfig.appCodeNumber
         versionName = BuildConfig.appVersion
 
         base.archivesName.set("Unciv")
-    }
-
-    // necessary for Android Work lib
-    kotlin {
-        compilerOptions {
-            jvmTarget = JvmTarget.JVM_1_8
-        }
     }
 
     // Had to add this crap for Travis to build, it wanted to sign the app
@@ -64,7 +56,7 @@ android {
         release {
             // If you make this true you get a version of the game that just flat-out doesn't run
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             isDebuggable = false
         }
     }
@@ -81,8 +73,14 @@ android {
         ignoreAssetsPattern = "!SaveFiles:!fonts:!maps:!music:!mods"
     }
     buildFeatures {
-        renderScript = true
         aidl = true
+    }
+}
+
+// necessary for Android WorkManager lib, used in MultiplayerTurnCheckWorker
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_1_8
     }
 }
 
@@ -147,11 +145,11 @@ tasks.register<Exec>("run") {
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.16.0")
-    implementation("androidx.work:work-runtime-ktx:2.10.3")
+    implementation(libs.android.ktx.core)
+    implementation(libs.android.ktx.runtime)
     // Needed to convert e.g. Android 26 API calls to Android 21
     // If you remove this run `./gradlew :android:lintDebug` to ensure everything's okay.
     // If you want to upgrade this, check it's working by building an apk,
     //   or by running `./gradlew :android:assembleRelease` which does that
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+    coreLibraryDesugaring(libs.android.desugar)
 }

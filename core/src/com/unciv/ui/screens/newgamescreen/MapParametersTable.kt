@@ -11,13 +11,18 @@ import com.unciv.logic.map.mapgenerator.MapGenerator
 import com.unciv.logic.map.mapgenerator.MapResourceSetting
 import com.unciv.models.metadata.GameParameters
 import com.unciv.models.ruleset.RulesetCache
+import com.unciv.models.ruleset.unique.GameContext
+import com.unciv.models.translations.tr
 import com.unciv.ui.components.extensions.*
 import com.unciv.ui.components.input.onChange
 import com.unciv.ui.components.input.onClick
 import com.unciv.ui.components.widgets.*
+import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.screens.basescreen.BaseScreen
 import com.unciv.ui.screens.victoryscreen.LoadMapPreview
 import com.unciv.utils.Concurrency
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.isActive
 
 /** Table for editing [mapParameters]
  *
@@ -44,6 +49,7 @@ class MapParametersTable(
     private var hexagonalSizeTable = Table()
     private var rectangularSizeTable = Table()
     lateinit var resourceSelectBox: TranslatedSelectBox
+    lateinit var mirrorSelectBox: TranslatedSelectBox
     private lateinit var noRuinsCheckbox: CheckBox
     private lateinit var noNaturalWondersCheckbox: CheckBox
     private lateinit var worldWrapCheckbox: CheckBox
@@ -56,8 +62,12 @@ class MapParametersTable(
     private lateinit var mapSizesOptionsValues: HashSet<String>
     private lateinit var mapResourcesOptionsValues: HashSet<String>
 
-    private val maxMapSize = ((previousScreen as? NewGameScreen)?.getColumnWidth() ?: 200f) - 10f // There is 5px padding each side
+    // Preview is shrunk to 65% of column width so Width/Height fields and warnings below stay visible without scrolling
+    private val maxMapSize = (((previousScreen as? NewGameScreen)?.getColumnWidth() ?: 200f) - 10f) * 0.65f
     private val mapTypeExample = Table()
+    private var exampleMapJob: Job? = null
+    @Volatile
+    private var exampleMapGeneration = 0
 
     // Keep references (in the key) and settings value getters (in the value) of the 'advanced' sliders
     // in a HashMap for reuse later - in the reset to defaults button. Better here as field than as closure.
@@ -100,6 +110,7 @@ class MapParametersTable(
         addWorldSizeTable()
         addResourceSelectBox()
         addWrappedCheckBoxes()
+        addMirrorSelectBox()
         addAdvancedSettings()
         generateExampleMap()
     }
@@ -110,19 +121,16 @@ class MapParametersTable(
     }
 
     private fun addMapShapeSelectBox() {
-        val mapShapes = listOfNotNull(
-            MapShape.hexagonal,
-            MapShape.flatEarth,
-            MapShape.rectangular
-        )
+        val mapShapes = MapShape.allValues
+        val rng = GameContext().stateBasedRandom("MapParametersTable.addMapShapeSelectBox", System.currentTimeMillis().toInt())
 
         if (mapGeneratedMainType == MapGeneratedMainType.randomGenerated) {
             mapShapesOptionsValues = mapShapes.toHashSet()
             val optionsTable = MultiCheckboxTable("{Enabled Map Shapes}", "NewGameMapShapes", mapShapesOptionsValues) {
                 if (mapShapesOptionsValues.isEmpty()) {
-                    mapParameters.shape = mapShapes.random()
+                    mapParameters.shape = mapShapes.random(rng)
                 } else {
-                    mapParameters.shape = mapShapesOptionsValues.random()
+                    mapParameters.shape = mapShapesOptionsValues.random(rng)
                 }
             }
             add(optionsTable).colspan(2).grow().row()
@@ -140,15 +148,24 @@ class MapParametersTable(
         }
     }
 
-    private fun generateExampleMap(){
-        val ruleset = if (previousScreen is NewGameScreen) previousScreen.ruleset else RulesetCache.getVanillaRuleset()
-        Concurrency.run("Generate example map") {
-            val mapParametersForExample = if (forMapEditor) mapParameters else mapParameters.clone().apply { seed = 0 }
-            val exampleMap = MapGenerator(ruleset).generateMap(mapParametersForExample, GameParameters(), emptyList())
+    internal fun generateExampleMap() {
+        cancelBackgroundJobs()
+        val generation = ++exampleMapGeneration
+        val ruleset = if (previousScreen is NewGameScreen) previousScreen.ruleset.clone() else RulesetCache.getVanillaRuleset()
+        val mapParametersForExample =
+            if (forMapEditor) mapParameters
+            else mapParameters.clone().apply {
+                seed = 0
+                mirroring = MirroringType.none
+            }
+        exampleMapJob = Concurrency.run("Generate example map") {
+            val exampleMap = MapGenerator(ruleset).generateMap(mapParametersForExample, GameParameters())
+            if (!isActive) return@run
             Concurrency.runOnGLThread {
+                if (generation != exampleMapGeneration) return@runOnGLThread
                 mapTypeExample.clear()
                 val mapPreview = LoadMapPreview(exampleMap, maxMapSize, maxMapSize)
-                if (!forMapEditor){
+                if (!forMapEditor) {
                     val label = "Example map".toLabel()
                     label.centerX(mapPreview)
                     label.y = mapPreview.height - label.height - 10f
@@ -157,33 +174,33 @@ class MapParametersTable(
                 mapTypeExample.add(mapPreview)
                 pack()
             }
+        }.apply {
+            invokeOnCompletion {
+                if (generation == exampleMapGeneration)
+                    exampleMapJob = null
+            }
         }
+    }
+
+    internal fun cancelBackgroundJobs() {
+        exampleMapGeneration++
+        exampleMapJob?.cancel()
+        exampleMapJob = null
     }
 
     private fun addMapTypeSelectBox() {
         // MapType is not an enum so we can't simply enumerate. //todo: make it so!
-        val mapTypes = listOfNotNull(
-            MapType.pangaea,
-            MapType.continentAndIslands,
-            MapType.twoContinents,
-            MapType.threeContinents,
-            MapType.fourCorners,
-            MapType.archipelago,
-            MapType.innerSea,
-            MapType.perlin,
-            MapType.fractal,
-            MapType.lakes,
-            MapType.smallContinents,
-            if (forMapEditor && mapGeneratedMainType != MapGeneratedMainType.randomGenerated) MapType.empty else null
-        )
+        val rng = GameContext().stateBasedRandom("MapParametersTable.addMapTypeSelectBox", System.currentTimeMillis().toInt())
+        var mapTypes = MapType.allValues
+        if (forMapEditor && mapGeneratedMainType != MapGeneratedMainType.randomGenerated) mapTypes = mapTypes + MapType.empty
 
         if (mapGeneratedMainType == MapGeneratedMainType.randomGenerated) {
             mapTypesOptionsValues = mapTypes.toHashSet()
             val optionsTable = MultiCheckboxTable("{Enabled Map Generation Types}", "NewGameMapGenerationTypes", mapTypesOptionsValues) {
                 if (mapTypesOptionsValues.isEmpty()) {
-                    mapParameters.type = mapTypes.random()
+                    mapParameters.type = mapTypes.random(rng)
                 } else {
-                    mapParameters.type = mapTypesOptionsValues.random()
+                    mapParameters.type = mapTypesOptionsValues.random(rng)
                 }
             }
             add(optionsTable).colspan(2).grow().row()
@@ -207,15 +224,23 @@ class MapParametersTable(
         }
     }
 
+    /** For [MapGeneratedMainType.randomGenerated]: sets [mapParameters].type to a valid value
+     *  respecting the currently enabled map type checkboxes, since no checkbox is ticked on activation. */
+    fun activateRandomMapType() {
+        if (!::mapTypesOptionsValues.isInitialized) return
+        mapParameters.type = if (mapTypesOptionsValues.isEmpty()) MapType.allValues.random() else mapTypesOptionsValues.random()
+    }
+
     private fun addWorldSizeTable() {
+        val rng = GameContext().stateBasedRandom("MapParametersTable.addWorldSizeTable", System.currentTimeMillis().toInt())
         if (mapGeneratedMainType == MapGeneratedMainType.randomGenerated) {
             val mapSizes = MapSize.names()
             mapSizesOptionsValues = mapSizes.toHashSet()
             val optionsTable = MultiCheckboxTable("{Enabled World Sizes}", "NewGameWorldSizes", mapSizesOptionsValues) {
                 if (mapSizesOptionsValues.isEmpty()) {
-                    mapParameters.mapSize = MapSize(mapSizes.random())
+                    mapParameters.mapSize = MapSize(mapSizes.random(rng))
                 } else {
-                    mapParameters.mapSize = MapSize(mapSizesOptionsValues.random())
+                    mapParameters.mapSize = MapSize(mapSizesOptionsValues.random(rng))
                 }
             }
             add(optionsTable).colspan(2).grow().row()
@@ -252,8 +277,8 @@ class MapParametersTable(
     private fun updateHexagonalWarnings() {
         val tiles = HexMath.getNumberOfTilesInHexagon(customMapSizeRadius.intValue ?: 0)
         hexWarningLabel.isVisible = tiles >= LARGE_MAP_TILES
-        if (tiles >= VERY_LARGE_MAP_TILES) hexWarningLabel.setText(VERY_LARGE_MAP_WARNING)
-        else hexWarningLabel.setText(LARGE_MAP_WARNING)
+        if (tiles >= VERY_LARGE_MAP_TILES) hexWarningLabel.setText(VERY_LARGE_MAP_WARNING.tr())
+        else hexWarningLabel.setText(LARGE_MAP_WARNING.tr())
     }
 
     private fun addRectangularSizeTable() {
@@ -285,8 +310,8 @@ class MapParametersTable(
     private fun updateRectangularWarnings() {
         val tiles = (customMapWidth.intValue ?: 0) * (customMapHeight.intValue ?: 0)
         rectWarningLabel.isVisible = tiles >= LARGE_MAP_TILES
-        if (tiles >= VERY_LARGE_MAP_TILES) rectWarningLabel.setText(VERY_LARGE_MAP_WARNING)
-        else rectWarningLabel.setText(LARGE_MAP_WARNING)
+        if (tiles >= VERY_LARGE_MAP_TILES) rectWarningLabel.setText(VERY_LARGE_MAP_WARNING.tr())
+        else rectWarningLabel.setText(LARGE_MAP_WARNING.tr())
     }
 
     private fun updateWorldSizeTable() {
@@ -303,15 +328,16 @@ class MapParametersTable(
     }
 
     private fun addResourceSelectBox() {
+        val rng = GameContext().stateBasedRandom("MapParametersTable.addResourceSelectBox", System.currentTimeMillis().toInt())
         val mapResources = MapResourceSetting.activeLabels()
 
         if (mapGeneratedMainType == MapGeneratedMainType.randomGenerated) {
             mapResourcesOptionsValues = mapResources.toHashSet()
             val optionsTable = MultiCheckboxTable("{Enabled Resource Settings}", "NewGameResourceSettings", mapResourcesOptionsValues) {
                 if (mapResourcesOptionsValues.isEmpty()) {
-                    mapParameters.mapResources = mapResources.random()
+                    mapParameters.mapResources = mapResources.random(rng)
                 } else {
-                    mapParameters.mapResources = mapResourcesOptionsValues.random()
+                    mapParameters.mapResources = mapResourcesOptionsValues.random(rng)
                 }
             }
             add(optionsTable).colspan(2).grow().row()
@@ -333,6 +359,26 @@ class MapParametersTable(
             add("{Resource Setting}:".toLabel()).left()
             add(resourceSelectBox).fillX().row()
         }
+    }
+
+    private fun addMirrorSelectBox() {
+        if (! forMapEditor)
+            return
+        
+        // only support these, as the rest seem buggy
+        val options = listOf(
+            MirroringType.none,
+            MirroringType.leftright
+        )
+        
+        mirrorSelectBox = TranslatedSelectBox(options, mapParameters.mirroring)
+
+        mirrorSelectBox.onChange {
+            mapParameters.mirroring = mirrorSelectBox.selected.value
+        }
+
+        add("{Mirroring Type}:".toLabel()).left()
+        add(mirrorSelectBox).fillX().row()
     }
 
     private fun Table.addNoRuinsCheckbox() {
@@ -373,7 +419,9 @@ class MapParametersTable(
     private fun addWrappedCheckBoxes() {
         val worldWrapWarning = "World wrap maps are very memory intensive - creating large world wrap maps on Android can lead to crashes!"
         if (mapGeneratedMainType == MapGeneratedMainType.randomGenerated) {
-            add(ExpanderTab("{Other Settings}", persistenceID = "NewGameOtherSettings", startsOutOpened = false) {
+            add(ExpanderTab("{Other Settings}",
+                icon = ImageGetter.getImage("OtherIcons/Settings").apply { setSize(20f, 20f) },
+                persistenceID = "NewGameOtherSettings", startsOutOpened = false) {
                 it.defaults().pad(5f,0f)
                 it.addStrategicBalanceCheckbox()
                 it.addLegendaryStartCheckbox()
@@ -396,7 +444,9 @@ class MapParametersTable(
     }
 
     private fun addAdvancedSettings() {
-        val expander = ExpanderTab("Advanced Settings", startsOutOpened = false, defaultPad = 0f) {
+        val expander = ExpanderTab("Advanced Settings",
+            icon = ImageGetter.getImage("OtherIcons/Settings").apply { setSize(20f, 20f) },
+            startsOutOpened = false, defaultPad = 0f) {
             addAdvancedControls(it)
         }
         add(expander).padTop(10f).colspan(2).growX().row()
@@ -441,7 +491,7 @@ class MapParametersTable(
             table.add(checkbox).colspan(2).row()
         }
         if (forMapEditor) {
-            addCheckBox("Randomize seed", true) {
+            addCheckBox("Randomize seed", randomizeSeed) {
                 randomizeSeed = it
             }
         }
@@ -468,7 +518,7 @@ class MapParametersTable(
         addSlider("Max Coast extension", {mapParameters.maxCoastExtension.toFloat()}, 1f, 5f)
         { mapParameters.maxCoastExtension = it.toInt() }.apply { stepSize = 1f }
 
-        addSlider("Biome areas extension", {mapParameters.tilesPerBiomeArea.toFloat()}, 1f, 15f)
+        addSlider("Biome size", {mapParameters.tilesPerBiomeArea.toFloat()}, 1f, 15f)
         { mapParameters.tilesPerBiomeArea = it.toInt() }.apply { stepSize = 1f }
 
         addSlider("Water level", {mapParameters.waterThreshold}, -0.1f, 0.1f)

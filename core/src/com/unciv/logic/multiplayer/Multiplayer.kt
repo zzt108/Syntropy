@@ -58,7 +58,7 @@ class Multiplayer {
          * B. MultiplayerTurnCheckWorker, which *as an Android worker* runs refreshes *even when the game is closed*.
          *    Only for Android, obviously
          */
-        multiplayerGameUpdater = flow<Unit> {
+        multiplayerGameUpdater = if (UncivGame.Current.supportsOnlineMultiplayer) flow<Unit> {
             while (true) {
                 delay(500)
                 if (!currentCoroutineContext().isActive) return@flow
@@ -76,7 +76,7 @@ class Multiplayer {
                 val doNotUpdate = if (currentGame == null) listOf() else listOf(currentGame)
                 throttle(lastAllGamesRefresh, multiplayerSettings.allGameRefreshDelay, {}, {}) { requestUpdate(doNotUpdate = doNotUpdate) }
             }
-        }.launchIn(CoroutineScope(Dispatcher.DAEMON))
+        }.launchIn(CoroutineScope(Dispatcher.DAEMON)) else Job().apply { cancel() }
     }
 
     @Readonly
@@ -140,13 +140,15 @@ class Multiplayer {
      * to ensure that no one else can upload the game in the meantime.
      *
      * Fires [MultiplayerGameUpdated]
+     * 
+     * @param responsibleCivNameOrPlayerId Who caused the player to resign? Can be the name of a civ, or for example a player id
      *
      * @throws FileStorageRateLimitReached if the file storage backend can't handle any additional actions for a time
      * @throws MultiplayerFileNotFoundException if the file can't be found
      * @throws MultiplayerAuthException if the authentication failed
      * @return false if it's not the user's turn and thus resigning did not happen
      */
-    suspend fun resignPlayer(game: MultiplayerGamePreview, playerCivName: String): String {
+    suspend fun resignPlayer(game: MultiplayerGamePreview, playerCivName: String, responsibleCivNameOrPlayerId: String): String {
         val preview = game.preview ?: throw game.error!!
         // download to work with the latest game state
         val gameInfo = multiplayerServer.tryDownloadGame(preview.gameId)
@@ -161,27 +163,38 @@ class Multiplayer {
         //Set civ info to AI
         playerCiv.playerType = PlayerType.AI
         playerCiv.playerId = ""
+        
+        playerCiv.turnsPlayedAsHuman = 0
+        playerCiv.totalTurnTimeSeconds = 0
 
         //call next turn so turn gets simulated by AI
         if (gameInfo.currentPlayer == playerCivName) gameInfo.nextTurn()
 
         //Add notification so everyone knows what happened
         //call for every civ cause AI players are skipped anyway
-        for (civ in gameInfo.civilizations) {
-            civ.addNotification("[${playerCiv.civName}] resigned and is now controlled by AI",
-                NotificationCategory.General, playerCiv.civName)
+
+        val notificationText = if (responsibleCivNameOrPlayerId == playerCivName || responsibleCivNameOrPlayerId.isEmpty()) {
+            "[$playerCivName] resigned and is now controlled by AI"
+        } else {
+            "[$playerCivName] was forcibly resigned by [$responsibleCivNameOrPlayerId] and is now controlled by AI"
         }
+        
+        for (civ in gameInfo.civilizations)
+            civ.addNotification(notificationText, NotificationCategory.General, playerCivName)
 
         multiplayerServer.uploadGame(gameInfo, withPreview = true)
         game.updatePreview(gameInfo.asPreview())
         return ""
     }
 
-    /** Returns false if game was not up to date
+    /** 
+     * Returns false if game was not up to date
      * Returned value indicates an error string - will be null if successful
      * We always pass in the player name to ensure if the button was clicked twice we don't skip 2 turns 
-     * */
-    suspend fun skipCurrentPlayerTurn(game: MultiplayerGamePreview, player: String): String? {
+     *
+     * @param responsibleCivNameOrPlayerId Who skipped the player's turn? Can be the name of a civ, or for example a player id
+     */
+    suspend fun skipCurrentPlayerTurn(game: MultiplayerGamePreview, playerCivName: String, responsibleCivNameOrPlayerId: String): String? {
         val preview = game.preview ?: return game.error!!.message
         // download to work with the latest game state
         val gameInfo: GameInfo
@@ -194,16 +207,28 @@ class Multiplayer {
         
         if (gameInfo.currentPlayer != preview.currentPlayer) {
             game.updatePreview(gameInfo.asPreview())
-            return "Game was out of sync with server - updated"
+            return "The game was out of sync with the server"
         }
         
-        if (gameInfo.currentPlayer != player) {
-            return "Could not pass turn - current player is ${gameInfo.currentPlayer}, not $player"
+        if (gameInfo.currentPlayer != playerCivName) {
+            return "Could not skip turn - current player is [${gameInfo.currentPlayer}], not [$playerCivName]"
         }
 
         val playerCiv = gameInfo.getCurrentPlayerCivilization()
         NextTurnAutomation.automateCivMoves(playerCiv, false)
         gameInfo.nextTurn()
+
+        //Add notification so everyone knows what happened
+        //call for every civ cause AI players are skipped anyway
+
+        val notificationText = if (responsibleCivNameOrPlayerId == playerCivName || responsibleCivNameOrPlayerId.isEmpty()) {
+            "[$playerCivName] skipped their own turn"
+        } else {
+            "[$playerCivName]'s turn was skipped by [$responsibleCivNameOrPlayerId]"
+        }
+
+        for (civ in gameInfo.civilizations)
+            civ.addNotification(notificationText, NotificationCategory.General, playerCiv.civName)
 
         multiplayerServer.uploadGame(gameInfo, withPreview = true)
         game.updatePreview(gameInfo.asPreview())
@@ -287,6 +312,7 @@ class Multiplayer {
     @Readonly
     private fun hasNewerGameState(preview1: GameInfoPreview, preview2: GameInfoPreview): Boolean {
         return preview1.turns > preview2.turns
+                || preview1.turns == preview2.turns && preview1.currentPlayer != preview2.currentPlayer
     }
 
     companion object {
