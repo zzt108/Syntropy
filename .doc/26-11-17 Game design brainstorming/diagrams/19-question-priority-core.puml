@@ -3,9 +3,9 @@
 ' Shows: an arrow A -> B means "the answer to A changes B"; a double arrow means the two depend on each other.
 '        The number is the impact score: how many other open questions and decisions the answer would change.
 ' Source: brainstorming-base.md §5 "Priority by impact" (edges to lower tiers and to decisions are listed there).
+' 2026-11-18: Q-19 Audience removed (resolved by D-54); Q-51 added (its only open target, Q-08, is P3: diagram 20).
 title Open questions: P1 and P2 dependencies
 left to right direction
-rectangle "P1  Q-19 Audience (8)" as Q19
 rectangle "P1  Q-42 Concept in Unciv terms (7)" as Q42
 rectangle "P1  Q-01 Who is the human (6)" as Q01
 rectangle "P1  Q-33 First ruleset (6)" as Q33
@@ -20,8 +20,7 @@ rectangle "P2  Q-03 Flow goals (4)" as Q03
 rectangle "P2  Q-07 Fractal hexagrams (4)" as Q07
 rectangle "P2  Q-14 Cooperation (4)" as Q14
 rectangle "P2  Q-27 Profile numbers (4)" as Q27
-Q19 --> Q03
-Q19 --> Q22
+rectangle "P2  Q-51 The author as player (4)" as Q51
 Q42 --> Q33
 Q01 --> Q03
 Q01 --> Q07

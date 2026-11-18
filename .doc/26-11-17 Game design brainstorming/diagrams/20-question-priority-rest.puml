@@ -1,6 +1,6 @@
 @startuml
 ' What: dependencies of the P3 open questions (§5 priority table), with the P4 questions as a note.
-' Shows: an arrow A -> B means "the answer to A changes B". Grey boxes are higher-tier targets (P1, P2)
+' Shows: an arrow A -> B means "the answer to A changes B". Grey boxes are higher-tier questions (P1, P2)
 '        or Q-20, the sink that collects all others (the smallest playable slice).
 ' Source: brainstorming-base.md §5 "Priority by impact".
 title Open questions: P3 dependencies
@@ -17,6 +17,8 @@ rectangle "P3  Q-18 Narrator (2)" as Q18
 rectangle "P3  Q-08 Keyword source (2)" as Q08
 rectangle "P3  Q-47 Pressure carry-over (3)" as Q47
 rectangle "P3  Q-48 Generation length in numbers (3)" as Q48
+rectangle "P3  Q-50 Synthetic playtests (3)" as Q50
+rectangle "Q-51 The author as player" as T51 #DDDDDD
 rectangle "Q-46 Soul state in the save" as T46 #DDDDDD
 rectangle "Q-14 Cooperation" as T14 #DDDDDD
 rectangle "Q-33 First ruleset" as T33 #DDDDDD
@@ -38,8 +40,11 @@ Q18 --> T20
 Q47 --> T25
 Q47 --> T46
 Q48 --> T20
+Q50 --> Q32
+Q50 --> T20
+T51 --> Q08
 note as P4
   P4 (impact 0-1): Q-26, Q-35, Q-41, Q-43,
-  Q-16, Q-30, Q-04, Q-38, Q-20
+  Q-16, Q-30, Q-04, Q-38, Q-52, Q-20
 end note
 @enduml
