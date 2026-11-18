@@ -61,15 +61,16 @@ Branch: `feature/upstream-hook-minimization`, fast-forwarded to `zzt_develop` @ 
 
 Branch: `feature/upstream-hook-minimization` @ `517f5649a` (= `zzt_develop`). Accepted: merge checklist (F2, F3), F4 guard, F8 conventions. Not taken: F5 (sound), F3 Gradle input, F6.
 
-- [ ] **T11 — Commit the review.**
+- [x] **T11 — Commit the review.** (`b98f903e6`)
   Commit `review.md` together with this todo update.
   **Verification:** `git status` clean; `git log -1 --stat` shows `review.md` and `todo.md` only.
 
-- [ ] **T12 — F4: guard the AI export against a civ mismatch.**
+- [x] **T12 — F4: guard the AI export against a civ mismatch.**
   In `AiExportUIInjector.createAiExportHeader`, remove `@Suppress("UNUSED_PARAMETER")`; on click, compare `viewingPlayer.civName` with `GUI.getSelectedPlayer().civName`. On mismatch, export nothing, log with `Gdx.app.error`, and show a `ToastPopup` ("Status export unavailable for this civilization"). Otherwise unchanged. Extract the comparison into a small pure function (e.g. `internal fun exportCivMatches(viewedCivName: String, selectedCivName: String): Boolean`) so it can be unit-tested without Gdx.
   **Verification:** a unit test for the pure function (match → true, mismatch → false) in `tests/.../aiexport/`; `./gradlew tests:test --rerun` green; `SyntropyHookInventoryTest` still green (H0 line unchanged); manual: "Copy Status" still copies the own civ's report.
+  Result (2026-11-18): `exportCivMatches` made public (the `tests` module is a separate Gradle module); `AiExportCivGuardTest` 3/3; `tests:test --rerun` 1047 tests, 0 failures; `desktop:dist` built; manual check OK, no guard log line in the run.
 
-- [ ] **T13 — F2/F3/F8: durable hook conventions and upstream merge checklist.**
+- [x] **T13 — F2/F3/F8: durable hook conventions and upstream merge checklist.**
   Create `.doc/upstream-merge.md` (tracked):
   - the hook conventions 1–6 from `spec.md` §1;
   - the hook registry pointer (`SyntropyHookInventoryTest`);
@@ -84,6 +85,7 @@ Branch: `feature/upstream-hook-minimization` @ `517f5649a` (= `zzt_develop`). Ac
 
   Add one sentence with a link to `.doc/upstream-merge.md` to the D-43 row in `.doc/26-11-17 Game design brainstorming/brainstorming-base.md`. Add a short "Upstream hooks" pointer to `CLAUDE.md` (local, untracked: see open decision below).
   **Verification:** the file renders (no PlantUML needed); the D-43 link resolves; the checklist commands are the ones actually used in T5/T7/T8 (plus the worktree dry run); `git status` shows `upstream-merge.md` and `brainstorming-base.md` only (CLAUDE.md is excluded).
+  Result (2026-11-18): `.doc/upstream-merge.md` written (conventions 1–6, hook table, 7-step checklist); D-43 links it; `CLAUDE.md` (still excluded via `.git/info/exclude`) got a one-line pointer. Link target and all referenced paths exist. The worktree dry-run git commands were executed once (`worktree add --detach`, `merge` → "Already up to date", `worktree remove`); the build step inside the worktree was not run.
 
 - [ ] **T14 — Land on `zzt_develop` and push.** *(commit/merge/push only on the user's request)*
   Commit T12–T13, fast-forward `zzt_develop`, push.
