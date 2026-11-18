@@ -1,0 +1,32 @@
+@startuml
+' What: the end-of-game Mirror (D-53).
+' Shows: three end triggers, the six layers of the portrait, and the two outputs:
+'        a short in-game portrait (patterns only) and a profile export for the player's own LLM.
+' Source: brainstorming-base.md, D-29, D-31 ... D-35, D-49, D-53, Q-49.
+title The Mirror at the end of a game
+start
+split
+  :Unciv end condition\n(victory type or defeat);
+  note right: VictoryScreen,\noneMoreTurnMode
+split again
+  :Retire button;
+split again
+  :Player asks for the Mirror;
+  note right: ends the game?\nQ-49
+end split
+:Freeze the soul history\n(all generations);
+:Build the six layers;
+note right
+  temperament, ego path,
+  temptation vs. flexibility,
+  agency, path in Q6,
+  words vs. deeds
+end note
+split
+  :In-game portrait\n(patterns, no numbers,\nno keyword-to-family map);
+split again
+  :Profile export\n(advisor kit, D-29);
+  :Player's own LLM\nwrites the analysis;
+end split
+stop
+@enduml

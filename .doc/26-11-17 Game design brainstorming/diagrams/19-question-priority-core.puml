@@ -14,6 +14,7 @@ rectangle "P2  Q-21 Ego illusion: on what scale (5)" as Q21
 rectangle "P2  Q-25 Standstill and collapse (5)" as Q25
 rectangle "P2  Q-22 What RPG means (5)" as Q22
 rectangle "P2  Q-06 Realm interaction (5)" as Q06
+rectangle "P2  Q-49 The Mirror's end triggers (5)" as Q49
 rectangle "P2  Q-45 Standstill trap (4)" as Q45
 rectangle "P2  Q-03 Flow goals (4)" as Q03
 rectangle "P2  Q-07 Fractal hexagrams (4)" as Q07
@@ -34,4 +35,5 @@ Q07 --> Q27
 Q06 <--> Q14
 Q45 --> Q25
 Q03 --> Q25
+Q49 --> Q03
 @enduml
