@@ -87,7 +87,7 @@ Branch: `feature/upstream-hook-minimization` @ `517f5649a` (= `zzt_develop`). Ac
   **Verification:** the file renders (no PlantUML needed); the D-43 link resolves; the checklist commands are the ones actually used in T5/T7/T8 (plus the worktree dry run); `git status` shows `upstream-merge.md` and `brainstorming-base.md` only (CLAUDE.md is excluded).
   Result (2026-11-18): `.doc/upstream-merge.md` written (conventions 1–6, hook table, 7-step checklist); D-43 links it; `CLAUDE.md` (still excluded via `.git/info/exclude`) got a one-line pointer. Link target and all referenced paths exist. The worktree dry-run git commands were executed once (`worktree add --detach`, `merge` → "Already up to date", `worktree remove`); the build step inside the worktree was not run.
 
-- [ ] **T14 — Land on `zzt_develop` and push.** *(commit/merge/push only on the user's request)*
+- [x] **T14 — Land on `zzt_develop` and push.** *(commit/merge/push only on the user's request)*
   Commit T12–T13, fast-forward `zzt_develop`, push.
   **Verification:** `zzt_develop` = `origin/zzt_develop`; `./gradlew tests:test --rerun` green on `zzt_develop`.
 
