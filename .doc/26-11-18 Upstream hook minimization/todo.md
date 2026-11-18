@@ -23,9 +23,10 @@ Upstream base of the touched files = merge-base `18eaa8995` (the upstream versio
   `./gradlew desktop:run`, load or start a game with notifications.
   **Verification:** right-click on a notification hides it; right-click on its category header restores it; left-click on a header still collapses/expands; Empire Overview → Notifications still lists the hidden ones; the AI-export header buttons still work.
 
-- [ ] **T5 — Prove the merge is conflict-free (dry run).**
+- [x] **T5 — Prove the merge is conflict-free (dry run).**
   Fetch upstream `master` into `refs/tmp/upstream-master` (refresh), then `git merge-tree --write-tree --name-only HEAD refs/tmp/upstream-master`.
   **Verification:** no conflicted files listed. If any remain, stop and report (do not improvise beyond the spec).
+  Result (2026-11-18): feature commit `c5849258b` vs. upstream `f00881660` → `merge-tree` exit 0, no conflicts; all 4 `SYNTROPY-HOOK` lines present in the merged tree; merged `NotificationsScroll.kt` differs from upstream by +2/−0, `WorldScreen.kt` by 1 line.
 
 - [ ] **T6 — Land the feature on `zzt_develop`.** *(commit/merge only on the user's request)*
   Commit the work on the feature branch, merge it into `zzt_develop`.
