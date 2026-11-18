@@ -91,9 +91,10 @@ Branch: `feature/upstream-hook-minimization` @ `517f5649a` (= `zzt_develop`). Ac
   Commit T12–T13, fast-forward `zzt_develop`, push.
   **Verification:** `zzt_develop` = `origin/zzt_develop`; `./gradlew tests:test --rerun` green on `zzt_develop`.
 
-- [ ] **T15 — Housekeeping.** *(only on the user's request)*
+- [x] **T15 — Housekeeping.** *(only on the user's request)*
   Delete the local and remote `feature/upstream-hook-minimization` branch (fully contained in `zzt_develop`) and the local ref `refs/tmp/upstream-master`.
   **Verification:** `git branch -a` no longer lists the branch; `git merge-base --is-ancestor` was checked before deletion; `git show-ref refs/tmp/upstream-master` finds nothing.
+  Result (2026-11-18): the branch was never pushed, so only the local branch existed; ancestor check passed (0 own commits), deleted with `git branch -d` (was `9c05bc89c`); `refs/tmp/upstream-master` deleted. Older branches (`feat/00-01-AI_Status_Export_Implementation`, `feat/Hide_OnScreen_Notifications`, `feature/game-design-brainstorming`) were left untouched.
 
 Open decisions (not tasks yet):
 - ~~Should `CLAUDE.md` be tracked? It is currently excluded via `.git/info/exclude`, so its content is not versioned or shared.~~ Resolved 2026-11-18 in another session; T13 adds its pointer to whatever `CLAUDE.md` exists then.
