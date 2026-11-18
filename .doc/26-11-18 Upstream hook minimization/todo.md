@@ -28,11 +28,11 @@ Upstream base of the touched files = merge-base `18eaa8995` (the upstream versio
   **Verification:** no conflicted files listed. If any remain, stop and report (do not improvise beyond the spec).
   Result (2026-11-18): feature commit `c5849258b` vs. upstream `f00881660` → `merge-tree` exit 0, no conflicts; all 4 `SYNTROPY-HOOK` lines present in the merged tree; merged `NotificationsScroll.kt` differs from upstream by +2/−0, `WorldScreen.kt` by 1 line.
 
-- [ ] **T6 — Land the feature on `zzt_develop`.** *(commit/merge only on the user's request)*
+- [x] **T6 — Land the feature on `zzt_develop`.** *(commit/merge only on the user's request)*
   Commit the work on the feature branch, merge it into `zzt_develop`.
   **Verification:** `zzt_develop` contains the commits; `./gradlew tests:test` green on `zzt_develop`.
 
-- [ ] **T7 — Sync `origin/master` with upstream.** *(user action on GitHub)*
+- [x] **T7 — Sync `origin/master` with upstream.** *(user action on GitHub)*
   On GitHub, switch the branch selector to `master` and use "Sync fork" there (fast-forward; `origin/master` has no own commits). Do **not** use "Discard commits" on `zzt_develop`. Then `git fetch origin`.
   **Verification:** `git rev-list --left-right --count origin/master...refs/tmp/upstream-master` → `0 0` (or upstream only ahead by commits newer than the fetch).
 
