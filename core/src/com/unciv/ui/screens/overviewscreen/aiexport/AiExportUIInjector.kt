@@ -3,19 +3,26 @@ package com.unciv.ui.screens.overviewscreen.aiexport
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.unciv.logic.civilization.Civilization
+import com.unciv.GUI
 import com.unciv.logic.civilization.aiexport.AiStatusExporter
 import com.unciv.ui.components.UncivTooltip.Companion.addTooltip
 import com.unciv.ui.components.extensions.toCheckBox
 import com.unciv.ui.components.extensions.toTextButton
 import com.unciv.ui.components.input.onClick
 import com.unciv.ui.popups.ToastPopup
+import com.unciv.view.CivView
 
 /**
  * Creates the header table for the Empire Overview screen, injecting the AI Status Export tools.
  * Gracefully degrades to just returning a table with the close button if the export feature fails to load.
+ *
+ * [viewingPlayer] is the overview's [CivView]; upstream keeps its wrapped Civilization protected.
+ * The exporter needs the full Civilization, so it is taken from the world screen's selected civ,
+ * which is the civ the overview was built from (`WorldScreen.selectedGameView.civView`).
+ * The parameter stays so the upstream hook line passes exactly what the screen has.
  */
-fun createAiExportHeader(viewingPlayer: Civilization, closeButton: Actor): Table {
+@Suppress("UNUSED_PARAMETER")
+fun createAiExportHeader(viewingPlayer: CivView, closeButton: Actor): Table {
     val headerTable = Table()
 
     try {
@@ -26,7 +33,7 @@ fun createAiExportHeader(viewingPlayer: Civilization, closeButton: Actor): Table
 
         val exportButton = "Copy Status".toTextButton()
         exportButton.onClick {
-            val reportText = AiStatusExporter.generateAiStatusReport(viewingPlayer, includeContextCheckbox.isChecked)
+            val reportText = AiStatusExporter.generateAiStatusReport(GUI.getSelectedPlayer(), includeContextCheckbox.isChecked)
             Gdx.app.clipboard.contents = reportText
             val stage = includeContextCheckbox.stage
             if (stage != null) {

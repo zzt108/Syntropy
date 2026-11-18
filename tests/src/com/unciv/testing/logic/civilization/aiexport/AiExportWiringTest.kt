@@ -1,8 +1,8 @@
 package com.unciv.testing.logic.civilization.aiexport
 
-import com.unciv.logic.civilization.Civilization
 import com.unciv.ui.screens.overviewscreen.EmpireOverviewScreen
 import com.unciv.ui.screens.overviewscreen.aiexport.createAiExportHeader
+import com.unciv.view.CivView
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -59,8 +59,8 @@ class AiExportWiringTest {
 
     @Test
     fun aiExportHeaderSignatureMatchesHook() {
-        // Compile-time guard: the hook in EmpireOverviewScreen passes (Civilization, Actor) and expects a Table.
-        val hook: (Civilization, com.badlogic.gdx.scenes.scene2d.Actor) -> com.badlogic.gdx.scenes.scene2d.ui.Table =
+        // Compile-time guard: the hook in EmpireOverviewScreen passes (CivView, Actor) and expects a Table.
+        val hook: (CivView, com.badlogic.gdx.scenes.scene2d.Actor) -> com.badlogic.gdx.scenes.scene2d.ui.Table =
             ::createAiExportHeader
         assertNotNull(hook)
     }
