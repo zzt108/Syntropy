@@ -42,3 +42,17 @@ Upstream base of the touched files = merge-base `18eaa8995` (the upstream versio
   Manual T4 re-check in the game after the fix: all OK, including "Copy Status" (2026-11-18).
   Open: push `zzt_develop` so GitHub shows 0 behind (on the user's request).
   **Verification:** merge completes without conflicts; `./gradlew tests:test` green; `./gradlew desktop:dist` builds; `git diff origin/master -- core/src/com/unciv/ui/screens/worldscreen/NotificationsScroll.kt` still shows exactly the 2 hook lines; quick T4 re-check in the game; GitHub shows `zzt_develop` 0 commits behind upstream.
+
+## Follow-up: uniform hook guard (spec §7)
+
+Branch: `feature/upstream-hook-minimization`, fast-forwarded to `zzt_develop` @ `e9bbc6175`.
+
+- [x] **T9 — `SyntropyHookInventoryTest` (source-based guard for all hooks).**
+  Create `tests/src/com/unciv/testing/syntropy/SyntropyHookInventoryTest.kt` per spec §7: registry with H0–H3, marker rule "trimmed line ends with `// SYNTROPY-HOOK`", source-root resolution by walking up from `user.dir`, Test 1 (every registered hook present exactly once), Test 2 (no unregistered hook line under `core/src`), Test 3 (unique ids, count matches).
+  **Verification:** `./gradlew tests:test --tests "com.unciv.testing.syntropy.SyntropyHookInventoryTest"` green (3 tests); negative checks done temporarily and reverted: (a) marker removed from H2 → Test 1 fails naming H2 and its file; (b) a marked line added in an unregistered place → Test 2 fails naming file:line; `git status` clean of those edits afterwards.
+  Result (2026-11-18): 3/3 green. (a) H2 marker removed → `everyRegisteredHookIsPresentExactlyOnce` fails naming H2, file and expected call; `registryIsConsistent` 4 vs 3. (b) `// probe  // SYNTROPY-HOOK` appended to `GUI.kt` → `noUnregisteredHookLines` fails naming `com/unciv/GUI.kt:72`; count 4 vs 5. Both edits reverted with `git restore`.
+  Finding: the first run of (a) passed because Gradle considered `tests:test` up-to-date (a comment-only change leaves the compiled classes identical, and the source files are not declared task inputs). The negative checks were rerun with `--rerun`. A dropped hook *call* changes bytecode and does rerun the tests; only a marker-only edit slips through incremental builds. For review: declare `core/src` as an input of `tests:test` (an upstream build-file hook) or accept the gap.
+
+- [x] **T10 — Remove the bytecode guard.**
+  Delete `tests/src/com/unciv/testing/logic/civilization/aiexport/AiExportWiringTest.kt`.
+  **Verification:** `./gradlew tests:test` green (total = previous 1044 − 3 removed + 3 new); `git grep -n AiExportWiringTest -- core tests` finds nothing; `git grep -n -E "SYNTROPY-HOOK\s*$" -- core` lists exactly the 4 registered lines.

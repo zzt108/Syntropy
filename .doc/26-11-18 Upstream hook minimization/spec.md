@@ -17,6 +17,7 @@ Scope:
 3. **Fully qualified names, no new imports.** Upstream import blocks change often and conflict easily.
 4. **Mark every hook** with a trailing `// SYNTROPY-HOOK` comment, so `git grep SYNTROPY-HOOK` lists the whole upstream surface.
 5. Prefer hooking at **call sites** (data passed in) over the inside of upstream classes.
+6. **Register every hook** in `SyntropyHookInventoryTest` (added by amendment §7). A hook line that is not registered, or a registered hook that disappeared, fails the test suite.
 
 ## 2. Affected Files
 
@@ -29,6 +30,8 @@ Scope:
 | modify (revert to upstream + 2 hook lines) | `core/src/com/unciv/ui/screens/worldscreen/NotificationsScroll.kt` |
 | modify (wrap 1 argument) | `core/src/com/unciv/ui/screens/worldscreen/WorldScreen.kt` (the `notificationsScroll.update(viewingCiv.notifications, …)` call) |
 | modify (add marker comment only) | `core/src/com/unciv/ui/screens/overviewscreen/EmpireOverviewScreen.kt` |
+| create (amendment §7) | `tests/src/com/unciv/testing/syntropy/SyntropyHookInventoryTest.kt` |
+| delete (amendment §7) | `tests/src/com/unciv/testing/logic/civilization/aiexport/AiExportWiringTest.kt` |
 
 ## 3. Architecture & Data Flow
 
@@ -159,3 +162,36 @@ WorldScreen -> NotificationsScroll : update(filtered list)
 note right of NotificationsScroll : hash differs, so the list is rebuilt
 @enduml
 ```
+
+## 7. Amendment: uniform hook guard (T9–T10, 2026-11-18)
+
+### Problem
+
+Only H0 is guarded, by `AiExportWiringTest`, which reads compiled `.class` files as Latin-1 text and searches the constant pool for substrings. That is opaque (failures do not name a source line), depends on Kotlin compiler output, and partly tests our own code rather than the upstream surface. H1–H3 have no guard: a merge resolved with "theirs" would drop them silently while the build stays green.
+
+### Design
+
+One source-based test, `SyntropyHookInventoryTest` (package `com.unciv.testing.syntropy`), is the single guard for all hook points.
+
+- **Registry:** a private list of `Hook(id, file, expectedCall)`; `file` is relative to `core/src`, `expectedCall` a distinctive substring of the hook line (e.g. `NotificationHider.visible(`). Initial entries: H0–H3 from §3.
+- **Marker rule:** a hook line is a line whose trimmed text **ends with** `// SYNTROPY-HOOK`. KDoc or prose that merely mentions the marker does not count.
+- **Test 1, every registered hook is present:** for each entry, the file exists and has exactly one hook line containing `expectedCall`. The failure message names id, file and the expected call, plus the hint "lost in an upstream merge?".
+- **Test 2, no unregistered hook:** walk all `.kt` files under `core/src`; every hook line found must match a registry entry (same file, contains `expectedCall`). The failure lists file:line of each unregistered hook. This enforces convention 6.
+- **Test 3, registry sanity:** ids are unique; the number of hook lines found equals the registry size.
+- **Source root resolution:** tests run with working dir `android/assets` (`tests/build.gradle.kts`). The test resolves `core/src` by walking up from `user.dir` until a directory containing `core/src/com/unciv` is found; if none, it fails with a clear message (no silent pass).
+- No Gdx, no `GdxTestRunner`: plain JUnit 4 file reading.
+
+`AiExportWiringTest` is deleted:
+- its H0 check moves into the registry;
+- its injector → exporter check covers our own code, which `AiStatusExporterTest` and the compiler already cover;
+- its signature check is redundant, because a signature mismatch breaks compilation of `core`.
+
+### Limits
+
+The test proves that the hook lines exist in the source, not that they behave correctly; behaviour stays covered by the compiler, `NotificationHiderTest`, `AiStatusExporterTest` and manual checks. Building `WorldScreen` in a unit test to observe H1 would be far heavier than the risk it covers.
+
+### Verification
+
+- `./gradlew tests:test` green, with the new test listed in the results.
+- Negative checks (each done temporarily and reverted, never committed): (a) remove the marker from one hook line → Test 1 fails naming that hook; (b) add a marked line in an unregistered place → Test 2 fails naming file:line.
+- `git grep -n AiExportWiringTest` finds nothing outside `.doc/`.
