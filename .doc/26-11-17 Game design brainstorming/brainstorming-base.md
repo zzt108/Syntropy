@@ -12,6 +12,8 @@ A turn-based, top-down, tribe-to-civilization game where **nobody wins**. The go
 
 Philosophy underneath: *everything is one mind's appearance, so everything is good.* No ego-feeding, no monetization pressure. The builder's reward is the flow of building it.
 
+**Ars poetica (D-46).** SYNTROPY is **not a Buddhist or Taoist game**. It borrows from those traditions (the I Ching, the five families, non-duality) because they model how people and societies actually behave **more closely than the principles under Civ** (growth, competition, victory). Civ's principles are not wrong, only narrower: they stay in the game as the part of reality they describe well.
+
 ## 2. Pillars
 
 | # | Pillar | One-line meaning |
@@ -21,6 +23,7 @@ Philosophy underneath: *everything is one mind's appearance, so everything is go
 | P3 | **Feedback** | Choices echo across generations (trauma, learning, cultural memory). |
 | P4 | **Strength in cooperation** | Alone is slow; together is fast but costs coordination. |
 | P5 | **Flow** *(meta-pillar)* | Every mechanic is judged by whether it helps or breaks flow. |
+| P6 | **Reality** *(meta-pillar)* | When two rules are possible, prefer the one closer to how people actually behave (D-46). |
 
 ## 3. Settled decisions (canon)
 
@@ -69,6 +72,9 @@ Philosophy underneath: *everything is one mind's appearance, so everything is go
 | D-41 | **Engine: a fork of Unciv** (open-source Civ V clone, **Kotlin + libGDX + Gradle**, MPL-2.0), fork `zzt108/Unciv`, local `C:\Git\Unciv`. Unciv is the **body** (D-36, D-37: hex map, cities, yields, research, happiness/unrest, AI, saves, desktop + Android). The **soul** (Fate engine, most/least screen, weighted dice, Journal, Standstill/collapse) is our own Kotlin code. | 2026-11-17. Supersedes D-04's Unity C#. Resource mapping: Production (+Food) → Material, Gold → Wealth, Science → Knowledge, Culture → Culture (D-11); Faith unused (D-03). The existing `AiStatusExporter` in the fork is the seed of the advisor kit's state export (D-29). MPL-2.0: modified Unciv files stay MPL and open. |
 | D-42 | **Civ V content is trimmed by ruleset only during development**: whatever can be removed or disabled without a code change (religion, city-states, great people, spaceship, victory types, Civ V nations/leaders…) goes out through a custom ruleset/mod. Code changes for trimming come later, if at all. | 2026-11-17. Keeps the fork's diff against upstream small (D-43). What can't be removed by ruleset stays visible for now. |
 | D-43 | **The fork stays unofficial forever; own code hooks in with minimal upstream changes.** Upstream did not accept the earlier `AiStatusExporter`, so no upstream merge is planned. Rule: our code lives in our own packages; upstream files get only small, clearly marked hook points (as with `AiExportUIInjector`). | 2026-11-17. Purpose: pulling upstream changes into the fork stays cheap. The Fate engine core should be Gdx-independent and unit-testable. |
+| D-44 | **Era policy = a modifier set per (family, fitting / tempting), lasting one generation.** (1) Mechanical form is Q-34 (a); (b) comes free, because the keyword text itself already suggests a direction, so there is no separate "suggested focus" UI. (2) The policy is keyed by the picked keyword's **family and fit**, not by the keyword: 5 × 2 = 10 policy sets instead of 768; the keyword gives the mood, the family gives the numbers, balance stays in one table. (3) Only a **"most"** pick sets a policy. "Least" (held line) = continuity, no new policy; a dice-flipped line = no policy, only its trigram change acts (coupling point 1); a cancelled line (D-35) = no policy, profile signal only. (4) **No separate ricochet mechanic.** A tempting pick already strikes back through ego ↑ → friction (coupling point 3, D-40) and line pressure next generation (coupling point 4, D-25). (5) **Fitting is smaller and grows with connection** (P4); **tempting is bigger, immediate and works alone.** (6) The policy lives **until the next generation change**, not for N turns (a generation can end early, D-39). (7) Policies of several "most" picks **stack additively**; repeated temptation is punished by ego, not by the numbers. | 2026-11-17. Resolves Q-34. Working values (**to be tuned in playtests, not decided**): tempting = flat +15%; fitting = +5% per connected realm, cap +20%. Draft policy table: Appendix C. The tempting column uses the **tempting keyword's** family, which differs from the fitting one on cross-family lines. Unciv form: §4 "Engine notes". |
+| D-45 | **"There are no others"** (Nishargadatta). The game has **no partner category**: no ally list, no friend/foe status the fitting bonus depends on. Reading (confirmed by the user): every realm the player is **in contact with** (has met) counts as a connection, **whatever the diplomatic state, war included**. | 2026-11-17. Answers "who counts as a partner" from D-44 (5). Splitting the world into own and other is itself an ego symptom (Pride's "Keep to our own", Appendix A.4), so the game must not build that split into its rules. Open detail: whether the bonus counts realms only, or also the *intensity* of the contact (trade, borders, diffusion); links Q-14, Q-21. |
+| D-46 | **Ars poetica: a model of reality, not a religion.** The game is not Buddhist or Taoist. Those traditions are used because they approximate reality better than Civ's principles; Civ's principles are not wrong, only narrower, and they stay. Text: §1. | 2026-11-17. User's words, wording approximate ("kb az ars poetica"). Fits D-03, D-08, D-17: no doctrine, no tradition's terms in the game. **Consequences (agreed 2026-11-17):** (a) Civ's logic is the **tempting column** (D-32, D-44): it really pays, now; the game only shows its ricochet. Civ is not the opponent, it is one half of reality. (b) A second design test beside flow: when two rules are possible, prefer the one closer to how people actually behave. Recorded as meta-pillar **P6** (§2). |
 
 ## 4. Core model (as understood so far)
 
@@ -159,6 +165,13 @@ The hexagram lines, ego and temperament can live as **stockpiled resources** tha
 
 Not checked yet: notifications triggered by gains, and the save file (plain JSON, readable by anyone who looks; acceptable).
 
+**Era policy (D-44) in Unciv**, checked in the code on 2026-11-17:
+
+- Unciv has timed uniques (`for [N] turns`, `UniqueType.ConditionalTimedUnique`), stored in `Civilization.temporaryUniques` and read by `Civilization.getMatchingUniques`. A fixed N does not fit, because a generation can end early (D-39).
+- `TemporaryUnique.endTurn()` only counts down entries with `turnsLeft >= 0`, so an entry with **`turnsLeft = -1` never expires**. The Fate engine adds its policy uniques that way and replaces them itself at the generation change, recognising its own entries by `uniqueObject.sourceObjectName`. No upstream file needs to change (D-43); the list is already saved with the game.
+- Catch: the public constructor expects a `for [N] turns` modifier and the source fields are private. Solve it at implementation time with a small own factory or a minimal marked hook.
+- Visibility: no screen lists `temporaryUniques`. The city stat breakdown labels a bonus by `getSourceNameForUser()` + `sourceObjectName`. If the source name is **the keyword itself**, the player sees e.g. "Let it ripen: +10% Food": immediate feedback (P5) without leaking family or fit (D-23).
+
 ## 5. Open questions & tensions
 
 Grouped by the session that should resolve them (§7). **Bold** = blocks other decisions.
@@ -184,7 +197,7 @@ Grouped by the session that should resolve them (§7). **Bold** = blocks other d
 
 ### Evolution & concepts
 - ~~Q-09 "No religion" vs. mythology/ritual as social evolution.~~ Resolved by D-03 (revised): religion may emerge, it is not a mechanic.
-- **Q-21 Ego illusion as a mechanic:** *partly resolved by D-31 (ego = one scalar per profile) and D-33 (it shows as loss of agency).* Still open: what is it measured on (person / group / realm, fractal?), what does it drive (status, in-group vs. out-group, conflict, belief systems), and how does it dissolve? Does it link to the hexagram (e.g. yang-excess = ego inflation)?
+- **Q-21 Ego illusion as a mechanic:** *partly resolved by D-31 (ego = one scalar per profile) and D-33 (it shows as loss of agency).* Still open: what is it measured on (person / group / realm, fractal?), what does it drive (status, in-group vs. out-group (a symptom only, never a rule: D-45), conflict, belief systems), and how does it dissolve? Does it link to the hexagram (e.g. yang-excess = ego inflation)?
 - Q-10 What is the **tag vocabulary**? It *is* the real rulebook: the LLM can only invent what tags can express.
 - Q-11 Can concepts **die, decay, or be forgotten** (entropy vs. syntropy)? That's the name of the game, after all.
 - Q-12 Biological evolution is out. What remains of the session-1 "generations" idea? Do people age, and do generations exist at all?
@@ -196,11 +209,11 @@ Grouped by the session that should resolve them (§7). **Bold** = blocks other d
 - **Q-22 What does "RPG" mean here?** Options: (a) the player *is* one character (hero/sage/catalyst) inside the society; (b) a cast of named characters with social roles, traits and growth (session 1); (c) both. Strongly coupled to Q-01, Q-07 (hexagram per person?) and Q-13.
 - ~~Q-13 Does the map with units survive the pivot?~~ Resolved by D-37: yes, a simple hex map with cities.
 - **Q-33 The body's first rules (D-36, D-37):** (a) Is food part of Material, or a separate stock that drives population growth (Civ 1 had food, shields, trade)? (b) Terrain list and city radius on hexes. (c) Units: settlers only at first, or also military/caravan-like units? Links Q-15.
-- **Q-34 Era policy without the Governor (D-38):** how does the picked keyword act on the body? Options: (a) a modifier set per keyword family for the whole generation (e.g. Discernment-fitting: +alliance, −short-term Wealth); (b) a suggested build/research focus the player may follow; (c) both. The ricochet of a tempting pick: immediate, delayed, or as line pressure only?
+- ~~Q-34 Era policy without the Governor (D-38).~~ Resolved by D-44 (modifier set per family and fit, one generation, ricochet through ego and line pressure only) and D-45 (no partner category).
 - Q-35 Culture has no direct ego drain (D-40). Intended (Culture = memory, hit by collapse, cf. Q-11, Q-25), or should one family drain it?
 - Q-36 Trigram → yield table (Appendix B) is a draft: confirm or rework; size of the modifiers.
 - **Q-37 Ego symptoms on the Unciv body (D-40, D-41):** waste, per-city unrest and the shared-production penalty have no Unciv counterpart. Options per family: (a) build the Civ 1 mechanic as own code behind a hook; (b) express it with existing uniques (e.g. a % yield penalty with a `when above [amount] [stat/resource]` conditional on a hidden resource); (c) remap to a Civ V mechanic that exists (empire-wide unhappiness, city resistance). Jealousy first needs something "shared" to hit (links Q-14).
-- Q-14 Cooperation: is it emergent (session 2) or a mechanic with numbers (session 1: logarithmic group effect, overlapping coalitions)?
+- Q-14 Cooperation: is it emergent (session 2) or a mechanic with numbers (session 1: logarithmic group effect, overlapping coalitions)? *Constraint since D-45: no partner category; cooperation is measured on contact (and maybe its intensity), never on an ally list.*
 - Q-15 Are there conflict and combat at all? If yes, how does war "feel" in a no-lose game?
 
 ### LLM side
@@ -245,12 +258,18 @@ Cheap trick worth trying early (still no code): **play a paper prototype in chat
 
 ## 8. Inspirations (to study, not to copy)
 
-- **Books/ideas:** David Loy, *The Great Awakening: A Buddhist Social Theory* (2003): the three poisons as *institutionalized* group-level forces. Kept as a **counterpoint**: the user rejects it (D-18: institutions are wisdom deflected by ego); Csikszentmihalyi, *Flow*; James P. Carse, *Finite and Infinite Games* (the source of "the infinite game"); Prigogine & Stengers, *Order Out of Chaos* (heads-up: the subtitle nearly repeats this book title); Fantappiè's syntropy; Eno & Schmidt's *Oblique Strategies* (a card deck of cryptic prompts, the nearest relative of "keywords as fate").
+- **Books/ideas:** Nishargadatta Maharaj, *I Am That* (1973): non-duality; "there are no others" is the root of D-45. David Loy, *The Great Awakening: A Buddhist Social Theory* (2003): the three poisons as *institutionalized* group-level forces. Kept as a **counterpoint**: the user rejects it (D-18: institutions are wisdom deflected by ego); Csikszentmihalyi, *Flow*; James P. Carse, *Finite and Infinite Games* (the source of "the infinite game"); Prigogine & Stengers, *Order Out of Chaos* (heads-up: the subtitle nearly repeats this book title); Fantappiè's syntropy; Eno & Schmidt's *Oblique Strategies* (a card deck of cryptic prompts, the nearest relative of "keywords as fate").
 - **Game patterns:** story generators that chronicle emergent history; minimalist choice-card games; non-violent, meditative builders; "social engineering" sliders in 4X games. Discuss which *patterns* we want, not which games.
 - **Name check:** "Syntropy" is also a term in agriculture (syntropic farming) and may be used by other products. Search before committing.
 - *HallucInc notes* (deleted 2026-11-17): a Reddit post (r/ClaudeAI, "I built a free browser game with Claude Code") on a CLAUDE.md and sub-agent setup for an AI-built game. **Where it overlaps with `CLAUDE.md`, `CLAUDE.md` wins** (start-of-session reading = "re-read `.doc/` at every phase"; gated milestones = the 4-phase workflow with a stop after each phase; commit cadence = "commit only when the user asks", not "after each change"). Only one non-overlapping idea is kept for implementation: "same seed + same choices = same run" as a never-break rule (cf. D-10, Q-17). Its sub-agent workflow is **rejected**: no sub-agents in this project.
 
 ## 9. Decision log (append-only, newest on top)
+
+- **2026-11-17**: Both D-46 consequences agreed: Civ's logic = the tempting column; the reality test becomes meta-pillar P6 (§2).
+
+- **2026-11-17**: D-45 reading confirmed by the user. Ars poetica added (D-46, §1): a model of reality, not a Buddhist/Taoist game; Civ's principles are narrower, not wrong. Two consequences proposed under D-46, not agreed yet.
+
+- **2026-11-17**: Era policy agreed (D-44, Q-34 closed): a modifier set per (family, fitting / tempting) for one generation, only "most" picks set it, no separate ricochet mechanic, fitting grows with connection, tempting is big and immediate. Working values left to playtests. "There are no others" (D-45): no partner category, every contacted realm counts. Unciv form (timed uniques with `turnsLeft = -1`, keyword as source name) added to §4 "Engine notes"; draft policy table in Appendix C. The brainstorming moves to its own branch `feature/game-design-brainstorming`.
 
 - **2026-11-17**: Consistency pass after D-41, no new decisions. Stale references fixed: D-12 (C# → Kotlin), title and D-14 (Flux), D-07 (`PROTOCOL_RESPONSE.md` obsolete), D-26 (⚠ rivals are code, D-28). Q-02 and Q-17 closed, Q-16 and Q-20 rewritten, Q-04 and Q-05 reworded; "per turn" → "per generation" in D-34, Q-30, Q-32. Appendix A.6 recount: same-family lines are 7 of 24, not 4; Confusion does appear in HG 12 (line 5). D-40 flagged against Unciv, new Q-37. Roadmap: S5 renamed, S8 Unciv integration added.
 
@@ -360,3 +379,17 @@ Draft for D-36 coupling point (1), not decided (Q-36). The **lower** trigram mod
 | ☱ Lake | joy, exchange | + contentment (less unrest) | + trade income |
 
 Reading check: **HG 11 Peace** (Heaven below, Earth above) = thinking at home, open and nourishing outward. **HG 12 Standstill** (Earth below, Heaven above) = only matter at home, pushing outward: the hegemon of D-19.
+
+## Appendix C. Era policy table, draft (2026-11-17)
+
+Draft for D-44. The effects are directions, not numbers; magnitudes are playtest values (D-44 notes). "Per connection" = per contacted realm (D-45). The tempting column is looked up by the **tempting keyword's** family.
+
+| Family | Fitting (slow, together) | Tempting (now, alone) |
+|---|---|---|
+| Space / Confusion | + growth, − unrest | + Production % (cutting corners) |
+| Mirror / Anger | + defence, more information about neighbours | + combat strength, + production of military units |
+| Equality / Pride | + Knowledge per connection | + Culture, flat (prestige) |
+| Discernment / Attachment | + Wealth per connection (trade) | + Gold, flat; − trade (hoarding) |
+| Accomplishing / Jealousy | + Production on shared work (needs Q-14, Q-37) | + Production on wonders (the race) |
+
+Open: Accomplishing-fitting has nothing to act on until "shared work" exists in the body (Q-37). Until then a fallback is needed, e.g. + Production per connection.
