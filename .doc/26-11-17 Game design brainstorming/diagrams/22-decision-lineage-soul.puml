@@ -1,7 +1,7 @@
 @startuml
 ' What: how the soul-mechanics decisions were refined by later ones (all "Refined by" notes in §3).
 ' Shows: older decision -> the decision that refined it. D-48 (the body casts the lines) refines the most.
-' Source: brainstorming-base.md §3, "Refined by" notes of D-08, D-09, D-21, D-22, D-24, D-34, D-36, D-40, D-42.
+' Source: brainstorming-base.md §3, "Refined by" notes of D-08, D-09, D-21, D-22, D-24, D-34, D-36, D-39, D-40, D-42.
 title Decision lineage: soul mechanics
 left to right direction
 rectangle "D-08 Hexagram = realm state" as D08
@@ -12,6 +12,8 @@ rectangle "D-24 Core formula" as D24
 rectangle "D-34 Trembling lines" as D34
 rectangle "D-35 Same-line cancel" as D35
 rectangle "D-36 Body and soul" as D36
+rectangle "D-39 Two clocks" as D39
+rectangle "D-52 Generation length at setup" as D52
 rectangle "D-40 Ego symptoms (intent)" as D40
 rectangle "D-42 Trim by ruleset" as D42
 rectangle "D-47 Trigram climate" as D47
@@ -28,6 +30,7 @@ D24 ..> D48
 D34 ..> D48
 D36 ..> D47
 D36 ..> D48
+D39 ..> D52
 D40 ..> D50
 D42 ..> D51
 @enduml

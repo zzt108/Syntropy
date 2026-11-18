@@ -1,17 +1,22 @@
 @startuml
-' What: the two clocks (D-39): ordinary turns for the body, generations for the soul.
-' Shows: pressure piles up turn by turn; a generation starts after about 5 turns or when the pressure crosses a threshold;
+' What: the two clocks (D-39, D-52): ordinary turns for the body, generations for the soul.
+' Shows: the generation length L is chosen at game setup (default about 5 turns); pressure piles up turn by turn,
+'        normalised to L; a generation starts after L turns or when the pressure crosses a threshold;
 '        at the generation change the body is read, the Choice of Fate runs, and the pressure is reset.
-' Source: brainstorming-base.md, D-25, D-39, D-48. Open: the exact pressure threshold.
-title Two clocks: turns and generations (D-39)
+' Source: brainstorming-base.md, D-25, D-39, D-48, D-52. Open: threshold and normalisation (Q-48), carry-over instead of reset (Q-47).
+title Two clocks: turns and generations (D-39, D-52)
 start
+:Game setup: generation length L\n(default about 5 turns);
 repeat
-  :Turn: produce, build, research, move, fight;
-  :World events and neighbours add pressure p to the lines;
-  :The profile adds pressure toward each line's current pole;
-repeat while (generation due?\n(about 5 turns, or pressure over threshold)) is (no) not (yes)
-:Generation: read the body, Choice of Fate, profile update;
-:New climate and era policy act until the next generation;
-:Pressure p is reset;
+  repeat
+    :Turn: produce, build, research, move, fight;
+    :World events and neighbours add pressure p to the lines\n(normalised to L);
+    :The profile adds pressure toward each line's current pole;
+  repeat while (generation due?\n(L turns, or pressure over threshold)) is (no) not (yes)
+  :Generation: read the body, Choice of Fate, profile update;
+  :New climate and era policy act until the next generation;
+  :Pressure p is reset;
+  note right: carry-over (decay) instead of reset: Q-47
+repeat while (game goes on?) is (yes) not (no)
 stop
 @enduml
