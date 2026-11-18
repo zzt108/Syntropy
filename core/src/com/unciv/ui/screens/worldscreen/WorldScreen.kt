@@ -456,7 +456,7 @@ class WorldScreen(
         val coveredNotificationsTop = stage.height - statusButtons.y
         val coveredNotificationsBottom = (bottomTileInfoTable.height + bottomTileInfoTable.y)
 //                (if (game.settings.showMinimap) minimapWrapper.height else 0f)
-        notificationsScroll.update(viewingCiv.notifications, coveredNotificationsTop, coveredNotificationsBottom)
+        notificationsScroll.update(com.unciv.syntropy.ui.NotificationHider.visible(viewingCiv.notifications), coveredNotificationsTop, coveredNotificationsBottom)  // SYNTROPY-HOOK
 
         val posZoomFromRight = if (game.settings.showMinimap) minimapWrapper.width
         else bottomTileInfoTable.width

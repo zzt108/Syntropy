@@ -22,7 +22,6 @@ import com.unciv.ui.components.extensions.packIfNeeded
 import com.unciv.ui.components.extensions.surroundWithCircle
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.input.onClick
-import com.unciv.ui.components.input.onRightClick
 import com.unciv.ui.components.widgets.ColorMarkupLabel
 import com.unciv.ui.components.widgets.WrappableLabel
 import com.unciv.ui.images.IconCircleGroup
@@ -89,7 +88,6 @@ class NotificationsScroll(
 
     //region private fields
     private var notificationsHash: Int = 0
-    internal val hiddenNotifications = HashSet<Notification>()
 
     private var notificationsTable = Table()
     private var topSpacerCell: Cell<Actor?>? = null
@@ -230,8 +228,7 @@ class NotificationsScroll(
         // Detect what to draw and if there's any changes part 1
         if (oneTimeNotification == null && clickedNotification != null)
             oneTimeNotification = clickedNotification  // reselecting can keep a "one-time" in the list
-
-        val newHash = updateNotificationsHash(notifications, oneTimeNotification)
+        val newHash = notifications.hashCode() + oneTimeNotification.hashCode() * 31
 
         // Determine highlight
         coloredHighlight = false
@@ -288,8 +285,7 @@ class NotificationsScroll(
             val notificationCategoryTable = Table()
 
             fun fillNotificationCategoryTable() {
-                val visibleNotifications = categoryNotifications.filter { it !in hiddenNotifications }
-                for (notification in visibleNotifications) {
+                for (notification in categoryNotifications) {
                     val item = ListItem(notification, backgroundDrawable)
                     itemWidths.add(item.itemWidth)
                     val itemCell = notificationCategoryTable.add(item)
@@ -302,9 +298,7 @@ class NotificationsScroll(
             notificationsTable.add(notificationCategoryTable).right().row()
 
             header?.onClick {
-                if (restoreHiddenInCategory(category)) {
-                    // Category was restored, world will re-render
-                } else if (notificationCategoryTable.hasChildren()) {
+                if (notificationCategoryTable.hasChildren()) {
                     notificationCategoryTable.clear()
                     notificationCategoryTable.pack()
                 } else {
@@ -312,6 +306,7 @@ class NotificationsScroll(
                     notificationCategoryTable.pack()
                 }
             }
+            com.unciv.syntropy.ui.NotificationHooks.categoryHeader(header, category)  // SYNTROPY-HOOK
         }
 
         // I think average looks better than max or non-equalized
@@ -412,9 +407,7 @@ class NotificationsScroll(
                 clickedNotification = notification
                 GUI.setUpdateWorldOnNextRender()
             }
-            onRightClick {
-                hideNotification(notification)
-            }
+            com.unciv.syntropy.ui.NotificationHooks.listItem(this, notification)  // SYNTROPY-HOOK
         }
     }
 
